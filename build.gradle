@@ -26,7 +26,7 @@ dependencies {
     // Note (alexa): this is the speakeasy fork of the har-java library
     implementation files('lib/har-java.jar')
     implementation files('lib/speakeasy-schemas.jar')
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.7.1') {
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.7.4') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
     implementation('org.slf4j:slf4j-api:1.7.36')
