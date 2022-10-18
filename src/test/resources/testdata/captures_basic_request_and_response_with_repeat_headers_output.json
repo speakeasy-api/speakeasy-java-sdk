@@ -1,0 +1,82 @@
+{
+  "log": {
+    "comment": "request capture for http://test.com/test",
+    "creator": {
+      "name": "speakeasy-java-sdk",
+      "version": "1.2.3"
+    },
+    "version": "1.2",
+    "entries": [
+      {
+        "startedDateTime": "2020-01-01T00:00:00Z",
+        "time": 1,
+        "request": {
+          "method": "GET",
+          "url": "http://test.com/test",
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Vary",
+              "value": "Origin"
+            },
+            {
+              "name": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "name": "Vary",
+              "value": "Access-Control-Request-Headers"
+            }
+          ],
+          "queryString": [],
+          "headersSize": 89,
+          "bodySize": -1
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headers": [
+            {
+              "name": "Content-Length",
+              "value": "4"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/octet-stream"
+            },
+            {
+              "name": "Vary",
+              "value": "Origin"
+            },
+            {
+              "name": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "name": "Vary",
+              "value": "Access-Control-Request-Headers"
+            }
+          ],
+          "content": {
+            "size": 4,
+            "mimeType": "application/octet-stream",
+            "text": "test"
+          },
+          "redirectURL": "",
+          "headersSize": 148,
+          "bodySize": 4
+        },
+        "cache": {},
+        "timings": {
+          "send": -1,
+          "wait": -1,
+          "receive": -1
+        },
+        "serverIPAddress": "test.com"
+      }
+    ]
+  }
+}
