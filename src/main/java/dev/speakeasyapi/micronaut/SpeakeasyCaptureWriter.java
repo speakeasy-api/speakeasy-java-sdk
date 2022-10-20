@@ -13,6 +13,10 @@ public class SpeakeasyCaptureWriter {
     private boolean resValid = true;
 
     public void writeRequest(final ByteBuf content) {
+        if (content.equals(Unpooled.EMPTY_BUFFER)) {
+            return;
+        }
+
         final int readIndex = content.readerIndex();
 
         final int readableBytes = content.readableBytes();
@@ -27,6 +31,10 @@ public class SpeakeasyCaptureWriter {
     }
 
     public void writeResponse(final ByteBuf content) {
+        if (content.equals(Unpooled.EMPTY_BUFFER)) {
+            return;
+        }
+
         final int readIndex = content.readerIndex();
 
         final int readableBytes = content.readableBytes();
