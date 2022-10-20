@@ -16,15 +16,15 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Accept-Encoding",
+              "name": "accept-encoding",
               "value": "gzip, deflate"
             },
             {
-              "name": "Connection",
+              "name": "connection",
               "value": "close"
             },
             {
-              "name": "Host",
+              "name": "host",
               "value": "test.com"
             }
           ],
@@ -39,15 +39,15 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Content-Length",
+              "name": "content-length",
               "value": "4"
             },
             {
-              "name": "Content-Type",
+              "name": "content-type",
               "value": "application/octet-stream"
             },
             {
-              "name": "Location",
+              "name": "location",
               "value": "http://test.com/test2"
             }
           ],

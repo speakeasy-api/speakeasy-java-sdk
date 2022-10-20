@@ -127,7 +127,7 @@ Schema:
 import dev.speakeasyapi.sdk.utils.SpeakeasyInterceptor;
 
 @GetMapping("/")
-public String handle(@RequestAttribute(SpeakeasyInterceptor.ControllerKey) SpeakeasyMiddlewareController controller){
+public String handle(@RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller){
 
         controller.setPathHint("/v1/users/{id}"); // This path hint will be used to match requests to your OpenAPI Schema
 
@@ -141,7 +141,7 @@ To help associate requests with customers/users of your APIs you can provide a c
 
 ```java
 @GetMapping("/v1/users/{id}") // The path template "/v1/users/{id}" is captured automatically by the SDK
-public String getUser(@PathVariable("id") String id,@RequestAttribute(SpeakeasyInterceptor.ControllerKey) SpeakeasyMiddlewareController controller){
+public String getUser(@PathVariable("id") String id,@RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller){
         controller.setCustomerID("a-customers-id"); // This customer ID will be used to associate this instance of a request with your customers/users
 
         // your handler logic here
@@ -165,7 +165,7 @@ Below are some examples on how to generate access tokens:
 
 ```java
 @GetMapping("embed_access_token")
-public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyInterceptor.ControllerKey) SpeakeasyMiddlewareController controller){
+public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller){
         String customerId=null;
 
         // populate your customerId

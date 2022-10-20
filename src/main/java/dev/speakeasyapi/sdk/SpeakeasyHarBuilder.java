@@ -1,25 +1,13 @@
 package dev.speakeasyapi.sdk;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-import java.util.function.BinaryOperator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -43,13 +31,19 @@ import com.smartbear.har.model.HarRequest;
 import com.smartbear.har.model.HarResponse;
 import com.smartbear.har.model.HarTimings;
 
-import dev.speakeasyapi.springboot.SpeakeasyResponseWrapper;
-
 public class SpeakeasyHarBuilder {
+    private final String sdkName = "speakeasy-java-sdk";
+    private final String speakeasyVersion = "1.2.3";
     private final String droppedBodyText = "--dropped--";
-    private final String cookieResponseHeaderName = "Set-Cookie";
 
     private final DefaultHarStreamWriter.Builder harWriterBuilder;
+
+    private final Logger logger;
+
+    public SpeakeasyHarBuilder(Logger logger) {
+        this.harWriterBuilder = new DefaultHarStreamWriter.Builder();
+        this.logger = logger;
+    }
 
     private OutputStream outputStream;
 
@@ -87,12 +81,6 @@ public class SpeakeasyHarBuilder {
         return this.port;
     }
 
-    private HarCreator creator;
-
-    public HarCreator getCreator() {
-        return this.creator;
-    }
-
     private HarRequest harRequest;
 
     public HarRequest getHarRequest() {
@@ -103,10 +91,6 @@ public class SpeakeasyHarBuilder {
 
     public HarResponse getHarResponse() {
         return this.harResponse;
-    }
-
-    public SpeakeasyHarBuilder() {
-        this.harWriterBuilder = new DefaultHarStreamWriter.Builder();
     }
 
     public SpeakeasyHarBuilder withStartTime(Instant startTime) {
@@ -129,37 +113,20 @@ public class SpeakeasyHarBuilder {
         return this;
     }
 
-    private BinaryOperator<List<String>> merge = new BinaryOperator<List<String>>() {
-        @Override
-        public List<String> apply(List<String> o, List<String> o2) {
-            o.addAll(o2);
-            return o;
-        }
-    };
-
-    public SpeakeasyHarBuilder withRequest(HttpServletRequest request,
-            ByteArrayOutputStream requestOutputStream,
-            boolean captureRequest,
-            Logger logger)
-            throws IOException {
-        Map<String, List<String>> headerMap = null;
-        if (request.getHeaderNames() != null) {
-            headerMap = Collections.list(request.getHeaderNames()).stream()
-                    .collect(Collectors.toMap(h -> h, h -> Collections.list(request.getHeaders(h)), merge));
-        }
-
+    public SpeakeasyHarBuilder withRequest(SpeakeasyRequest request) throws IOException {
+        // Parse cookies
         List<HarCookie> harCookieList = new ArrayList<>();
-        // Note: It appears that java inserts cookies with headers,
-        // so this never gets called.
-        if (request.getCookies() != null) {
-            // Parse cookies
-            harCookieList = Arrays.stream(request.getCookies()).map(c -> {
+
+        List<SpeakeasyCookie> cookies = request.getCookies();
+
+        if (cookies != null) {
+            harCookieList = cookies.stream().map(c -> {
                 HarCookieBuilder cookieBuilder = new HarCookieBuilder();
                 try {
                     cookieBuilder.withName(c.getName())
                             .withValue(c.getValue());
                 } catch (Exception e) {
-                    logger.debug("speakeasy-sdk, error building cookies:", e);
+                    this.logger.debug("speakeasy-sdk, error building cookies:", e);
                 }
                 return cookieBuilder.build();
             }).collect(Collectors.toList());
@@ -168,8 +135,10 @@ public class SpeakeasyHarBuilder {
         // Parse headers
         List<HarHeader> harHeaderList = new ArrayList<HarHeader>();
 
-        if (headerMap != null) {
-            harHeaderList = headerMap.entrySet()
+        Map<String, List<String>> headers = request.getHeaders();
+
+        if (headers != null) {
+            harHeaderList = headers.entrySet()
                     .stream()
                     .map(entry -> {
                         List<HarHeader> headersList = new ArrayList<>();
@@ -187,27 +156,24 @@ public class SpeakeasyHarBuilder {
         }
 
         HarPostDataBuilder postDataBuilder = new HarPostDataBuilder()
-                .withMimeType(request.getContentType());
-        if (captureRequest) {
-            postDataBuilder.withText(requestOutputStream.toString());
-        } else {
-            postDataBuilder.withText(droppedBodyText);
-        }
+                .withMimeType(request.getContentType())
+                .withText(request.getBodyText(droppedBodyText));
+
         HarPostData postData = postDataBuilder.build();
 
         String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
 
         HarRequestBuilder builder = new HarRequestBuilder()
-                .withBodySize(request.getContentLengthLong())
+                .withBodySize(request.getContentLength())
                 .withCookies(harCookieList)
                 .withHeaders(harHeaderList)
-                .withHeadersSize(calculateHeaderSize(headerMap))
+                .withHeadersSize(request.getHeaderSize())
                 .withHttpVersion(request.getProtocol())
                 .withMethod(request.getMethod())
                 .withQueryString(queryString)
                 .withUrl(request.getRequestURI());
 
-        if (requestOutputStream.size() > 0) {
+        if (request.getContentLength() > 0) {
             builder.withPostData(postData);
         }
 
@@ -215,31 +181,18 @@ public class SpeakeasyHarBuilder {
         return this;
     }
 
-    public SpeakeasyHarBuilder withResponse(HttpServletResponse response,
-            ByteArrayOutputStream responseOutputStream,
-            boolean captureResponse,
-            String httpVersion,
-            Logger logger) {
+    public SpeakeasyHarBuilder withResponse(SpeakeasyResponse response, String httpVersion) {
         if (response == null) {
             return this;
         }
-        Map<String, List<String>> headerMap = null;
-        List<HarCookie> harCookieList = null;
+
+        // Parse headers
         List<HarHeader> harHeaderList = null;
 
-        if (response.getHeaderNames() != null) {
-            headerMap = response.getHeaderNames().stream()
-                    .collect(Collectors.toMap(h -> h, h -> new ArrayList<>(response.getHeaders(h)), merge));
+        Map<String, List<String>> headers = response.getHeaders();
 
-            // Parse cookies
-            harCookieList = headerMap.entrySet()
-                    .stream()
-                    .filter(entry -> cookieResponseHeaderName.equals(entry.getKey()))
-                    .flatMap(entry -> entry.getValue().stream().map(hv -> parseSetCookieString(hv)))
-                    .collect(Collectors.toList());
-
-            // Parse headers
-            harHeaderList = headerMap.entrySet()
+        if (headers != null) {
+            harHeaderList = headers.entrySet()
                     .stream()
                     .map(entry -> {
                         List<HarHeader> headersList = new ArrayList<>();
@@ -254,7 +207,29 @@ public class SpeakeasyHarBuilder {
                     .collect(Collectors.toList());
 
             harHeaderList.sort((h1, h2) -> h1.getName().compareToIgnoreCase(h2.getName()));
+        }
 
+        // Parse cookies
+        List<SpeakeasyCookie> cookies = response.getCookies(this.startTime);
+        List<HarCookie> harCookieList = null;
+
+        if (cookies != null) {
+            harCookieList = cookies.stream().map(c -> {
+                HarCookieBuilder cookieBuilder = new HarCookieBuilder();
+                try {
+                    cookieBuilder
+                            .withName(c.getName())
+                            .withValue(c.getValue())
+                            .withExpires(c.getExpires())
+                            .withHttpOnly(c.getHttpOnly())
+                            .withPath(c.getPath())
+                            .withSecure(c.getSecure())
+                            .withDomain(c.getDomain());
+                } catch (Exception e) {
+                    this.logger.debug("speakeasy-sdk, error building cookies:", e);
+                }
+                return cookieBuilder.build();
+            }).collect(Collectors.toList());
         }
 
         String contentType = response.getContentType();
@@ -262,35 +237,19 @@ public class SpeakeasyHarBuilder {
             contentType = "application/octet-stream"; // Default HTTP content type
         }
 
-        try {
-            responseOutputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        long contentSize = ((SpeakeasyResponseWrapper) response).getRealBodySize();
-
         HarContentBuilder harContentBuilder = new HarContentBuilder()
-                .withSize(captureResponse && contentSize > 0 ? contentSize : -1)
+                .withSize(response.getContentLength(false))
                 .withMimeType(contentType);
 
-        long bodySize = contentSize > 0 ? contentSize : -1;
+        long bodySize = response.getContentLength(true);
         if (response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
             bodySize = 0;
             harContentBuilder.withSize(-1l);
         } else {
-            if (captureResponse) {
-                harContentBuilder.withText(responseOutputStream.toString());
-            } else {
-                harContentBuilder.withText(droppedBodyText);
-            }
+            harContentBuilder.withText(response.getBodyText(droppedBodyText));
         }
 
-        String redirectURL = "";
-        Collection<String> locationHeaders = response.getHeaders("Location");
-        if (locationHeaders != null && locationHeaders.size() > 0) {
-            redirectURL = locationHeaders.iterator().next();
-        }
+        String redirectURL = response.getLocationHeader();
 
         int statusCode = response.getStatus();
         String statusText = null;
@@ -299,6 +258,7 @@ public class SpeakeasyHarBuilder {
         } catch (Exception e) {
             logger.debug("speakeasy-sdk, error retrieving status: ", e);
         }
+
         this.harResponse = new HarResponseBuilder()
                 .withStatus(statusCode)
                 .withStatusText(statusText)
@@ -306,7 +266,7 @@ public class SpeakeasyHarBuilder {
                 .withContent(harContentBuilder.build())
                 .withBodySize(bodySize)
                 .withHeaders(harHeaderList)
-                .withHeadersSize(calculateHeaderSize(headerMap))
+                .withHeadersSize(response.getHeaderSize())
                 .withHttpVersion(httpVersion)
                 .withRedirectURL(redirectURL)
                 .build();
@@ -324,75 +284,11 @@ public class SpeakeasyHarBuilder {
         return this;
     }
 
-    public SpeakeasyHarBuilder withCreator(HarCreator creator) {
-        this.creator = creator;
-        return this;
-    }
-
-    private HarCookie parseSetCookieString(String cookie) {
-        HarCookieBuilder cookieBuilder = new HarCookieBuilder();
-
-        String[] cookieParts = cookie.split("; ");
-
-        for (String cookiePart : cookieParts) {
-            String cookieRegex = "([^=]+)=?([^=]*)";
-            Pattern pattern = Pattern.compile(cookieRegex);
-            Matcher matcher = pattern.matcher(cookiePart);
-
-            while (matcher.find()) {
-                String key = matcher.group(1);
-                String value = matcher.group(2);
-                switch (key.toLowerCase()) {
-                    case "domain":
-                        cookieBuilder.withDomain(value);
-                        break;
-                    case "max-age": {
-                        int maxAge = Integer.parseInt(value);
-
-                        Instant expires = startTime.plus(maxAge, ChronoUnit.SECONDS);
-
-                        cookieBuilder.withExpires(expires.toString());
-                        break;
-                    }
-                    case "expires": {
-                        try {
-                            SimpleDateFormat inFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-                            Date expiresDate = inFormat.parse(value);
-
-                            SimpleDateFormat outFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-                            outFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                            String expires = outFormat.format(expiresDate);
-
-                            cookieBuilder.withExpires(expires);
-                        } catch (Exception e) {
-                        }
-                        break;
-                    }
-                    case "httponly":
-                        cookieBuilder.withHttpOnly(true);
-                        break;
-                    case "path":
-                        cookieBuilder.withPath(value);
-                        break;
-                    case "secure":
-                        cookieBuilder.withSecure(true);
-                        break;
-                    default:
-                        cookieBuilder.withName(key);
-                        cookieBuilder.withValue(value);
-                        break;
-                }
-            }
-        }
-        return cookieBuilder.build();
-    }
-
     public void build() throws IOException {
         DefaultHarStreamWriter harWriter = harWriterBuilder
                 .withOutputStream(outputStream)
                 .withComment(comment)
-                .withCreator(creator)
+                .withCreator(new HarCreator(this.sdkName, "", this.speakeasyVersion))
                 .build();
 
         HarEntryBuilder builder = new HarEntryBuilder()
@@ -410,23 +306,5 @@ public class SpeakeasyHarBuilder {
 
         harWriter.addEntry(builder.build());
         harWriter.closeHar();
-    }
-
-    private long calculateHeaderSize(Map<String, List<String>> headers) {
-        if (headers == null) {
-            return 0;
-        }
-
-        StringBuilder builder = new StringBuilder();
-        headers.forEach((key, values) -> {
-            for (String value : values) {
-                builder.append(key)
-                        .append(": ")
-                        .append(value)
-                        .append("\r\n");
-            }
-        });
-
-        return builder.toString().getBytes().length;
     }
 }

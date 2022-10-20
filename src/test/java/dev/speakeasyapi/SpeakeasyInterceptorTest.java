@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.speakeasyapi.sdk.SpeakeasyConfig;
 import dev.speakeasyapi.sdk.SpeakeasyMiddlewareController;
 import dev.speakeasyapi.springboot.SpeakeasyFilter;
 import dev.speakeasyapi.springboot.SpeakeasyInterceptor;
@@ -51,7 +52,7 @@ class SpeakeasyInterceptorTest {
         this.mockMvc = MockMvcBuilders
                 .standaloneSetup(new SpeakeasyInterceptorTest.TestPathController(),
                         new SpeakeasyInterceptorTest.RootPathController())
-                .addInterceptors(new SpeakeasyInterceptor("test", "test", "test", client))
+                .addInterceptors(new SpeakeasyInterceptor(new SpeakeasyConfig(), client))
                 .addFilter(new SpeakeasyFilter())
                 .build();
     }
@@ -217,7 +218,7 @@ class SpeakeasyInterceptorTest {
 
         @GetMapping("/manualPathHint")
         public String manualPathHint(
-                @RequestAttribute(SpeakeasyInterceptor.ControllerKey) SpeakeasyMiddlewareController controller) {
+                @RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller) {
 
             controller.setPathHint("/my/manual/path/hint");
 
@@ -226,7 +227,7 @@ class SpeakeasyInterceptorTest {
 
         @PatchMapping("/getCustomerID")
         public String getCustomerID(
-                @RequestAttribute(SpeakeasyInterceptor.ControllerKey) SpeakeasyMiddlewareController controller) {
+                @RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller) {
 
             controller.setCustomerID("a-customers-id");
 

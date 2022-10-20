@@ -7,29 +7,29 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import dev.speakeasyapi.sdk.SpeakeasyConfig;
+
 @Configuration
 @ConfigurationProperties(prefix = "speakeasy-api")
 @ConfigurationPropertiesScan
 @Import(SpeakeasyFilter.class)
 public class EnableSpeakeasy implements WebMvcConfigurer {
-    private String apiKey;
-    private String apiID;
-    private String versionID;
+    private SpeakeasyConfig cfg = new SpeakeasyConfig();
 
     public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
+        this.cfg.setApiKey(apiKey);
     }
 
     public void setApiID(String apiID) {
-        this.apiID = apiID;
+        this.cfg.setApiID(apiID);
     }
 
     public void setVersionID(String versionID) {
-        this.versionID = versionID;
+        this.cfg.setVersionID(versionID);
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SpeakeasyInterceptor(apiKey, apiID, versionID));
+        registry.addInterceptor(new SpeakeasyInterceptor(this.cfg));
     }
 }

@@ -16,23 +16,23 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Accept-Encoding",
+              "name": "accept-encoding",
               "value": "gzip, deflate"
             },
             {
-              "name": "Connection",
+              "name": "connection",
               "value": "close"
             },
             {
-              "name": "Content-Length",
+              "name": "content-length",
               "value": "9"
             },
             {
-              "name": "Content-Type",
+              "name": "content-type",
               "value": "application/json"
             },
             {
-              "name": "Host",
+              "name": "host",
               "value": "test.com"
             }
           ],
@@ -52,11 +52,11 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Content-Length",
+              "name": "content-length",
               "value": "40"
             },
             {
-              "name": "Content-Type",
+              "name": "content-type",
               "value": "text/plain; charset=utf-8"
             }
           ],

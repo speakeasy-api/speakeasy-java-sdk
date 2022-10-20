@@ -16,15 +16,15 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Accept-Encoding",
+              "name": "accept-encoding",
               "value": "gzip, deflate"
             },
             {
-              "name": "Connection",
+              "name": "connection",
               "value": "close"
             },
             {
-              "name": "Host",
+              "name": "host",
               "value": "test.com"
             }
           ],
