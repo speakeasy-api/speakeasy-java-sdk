@@ -21,8 +21,6 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(final ChannelHandlerContext context, final Object message) {
-        System.out.println(message.getClass().getName());
-
         if (HttpRequest.class.isInstance(message)) {
             this.request = new SpeakeasyNettyRequest(context, (HttpRequest) message);
             this.request.register(writer);
@@ -37,7 +35,6 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         }
 
         if (LastHttpContent.class.isInstance(message)) {
-            System.out.println("Request complete");
             requestComplete = true;
 
             if (responseComplete) {
@@ -50,8 +47,6 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) {
-        System.out.println(message.getClass().getName());
-
         if (HttpResponse.class.isInstance(message)) {
             this.response = new SpeakeasyNettyResponse(context, (HttpResponse) message);
             this.response.register(writer);
@@ -66,7 +61,6 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         }
 
         if (LastHttpContent.class.isInstance(message)) {
-            System.out.println("Response complete");
             responseComplete = true;
 
             if (requestComplete) {
@@ -78,5 +72,6 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
     }
 
     private void capture() {
+        new SpeakeasyCapture().capture(request, response);
     }
 }

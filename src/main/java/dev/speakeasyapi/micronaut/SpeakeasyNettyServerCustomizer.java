@@ -28,8 +28,6 @@ public class SpeakeasyNettyServerCustomizer implements BeanCreatedEventListener<
 
         @Override
         public void onStreamPipelineBuilt() {
-            System.out.println("here");
-
             channel.pipeline().addBefore(ChannelPipelineCustomizer.HANDLER_HTTP_STREAM, "speakeasy",
                     new SpeakeasyChannelDuplexHandler());
         }

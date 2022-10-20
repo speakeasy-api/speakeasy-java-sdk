@@ -6,8 +6,8 @@ import dev.speakeasyapi.sdk.client.ISpeakeasyClient;
 public class SpeakeasyMiddlewareController {
     public static final String ControllerKey = "speakeasyMiddlewareController";
 
-    private String pathHint;
-    private String customerID;
+    private String pathHint = "";
+    private String customerID = "";
     private final ISpeakeasyClient client;
 
     public SpeakeasyMiddlewareController(ISpeakeasyClient client) {

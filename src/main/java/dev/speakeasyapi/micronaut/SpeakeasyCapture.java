@@ -41,7 +41,6 @@ public class SpeakeasyCapture implements Runnable {
     }
 
     public void run() {
-        System.out.println("Captured request");
         Instant endTime = Instant.now();
 
         SpeakeasyRequestContext context = SpeakeasySingleton.getInstance()
@@ -76,6 +75,7 @@ public class SpeakeasyCapture implements Runnable {
             try {
                 context.getClient().ingestGrpc(harString, controller.getPathHint(), controller.getCustomerID());
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.debug("speakeasy-sdk: Failed to ingest request:", e);
             }
         }
