@@ -49,11 +49,27 @@ public class SpeakeasyCaptureWriter {
     }
 
     public byte[] getReqBuffer() {
-        return reqBuffer.array();
+        final int length = reqBuffer.readableBytes();
+
+        if (length == reqBuffer.capacity()) {
+            return reqBuffer.array();
+        }
+
+        final byte[] target = new byte[length];
+        System.arraycopy(reqBuffer.array(), 0, target, 0, length);
+        return target;
     }
 
     public byte[] getResBuffer() {
-        return resBuffer.array();
+        final int length = resBuffer.readableBytes();
+
+        if (length == resBuffer.capacity()) {
+            return resBuffer.array();
+        }
+
+        final byte[] target = new byte[length];
+        System.arraycopy(resBuffer.array(), 0, target, 0, length);
+        return target;
     }
 
     public boolean isReqValid() {

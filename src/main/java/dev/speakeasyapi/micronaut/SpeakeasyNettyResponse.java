@@ -9,18 +9,15 @@ import dev.speakeasyapi.sdk.SpeakeasyCookie;
 import dev.speakeasyapi.sdk.SpeakeasyResponse;
 import dev.speakeasyapi.sdk.utils.Utils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpUtil;
 
 public class SpeakeasyNettyResponse implements SpeakeasyResponse {
-    private final ChannelHandlerContext context;
     private final HttpResponse response;
     private SpeakeasyCaptureWriter writer;
 
-    public SpeakeasyNettyResponse(final ChannelHandlerContext context, final HttpResponse response) {
-        this.context = context;
+    public SpeakeasyNettyResponse(final HttpResponse response) {
         this.response = response;
     }
 

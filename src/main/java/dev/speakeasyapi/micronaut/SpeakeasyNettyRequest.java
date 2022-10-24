@@ -13,7 +13,6 @@ import dev.speakeasyapi.sdk.SpeakeasyCookie;
 import dev.speakeasyapi.sdk.SpeakeasyRequest;
 import dev.speakeasyapi.sdk.utils.Utils;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
@@ -22,13 +21,11 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 
 public class SpeakeasyNettyRequest implements SpeakeasyRequest {
-    private final ChannelHandlerContext context;
     private final HttpRequest request;
     private SpeakeasyCaptureWriter writer;
     private final String requestId;
 
-    public SpeakeasyNettyRequest(final ChannelHandlerContext context, final HttpRequest request) {
-        this.context = context;
+    public SpeakeasyNettyRequest(final HttpRequest request) {
         this.request = request;
 
         this.requestId = UUID.randomUUID().toString();

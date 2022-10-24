@@ -15,15 +15,17 @@ import io.netty.handler.codec.http.LastHttpContent;
 public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
     private SpeakeasyNettyRequest request;
     private SpeakeasyNettyResponse response;
-    private SpeakeasyCaptureWriter writer = new SpeakeasyCaptureWriter();
-    private boolean requestComplete = false;
-    private boolean responseComplete = false;
+    private SpeakeasyCaptureWriter writer;
+    private boolean captured = false;
 
     @Override
     public void channelRead(final ChannelHandlerContext context, final Object message) {
         if (HttpRequest.class.isInstance(message)) {
-            this.request = new SpeakeasyNettyRequest(context, (HttpRequest) message);
-            this.request.register(writer);
+            captured = false;
+            HttpRequest httpRequest = (HttpRequest) message;
+            this.request = new SpeakeasyNettyRequest(httpRequest);
+            this.writer = new SpeakeasyCaptureWriter();
+            this.request.register(this.writer);
         }
 
         if (HttpContent.class.isInstance(message)) {
@@ -35,9 +37,7 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         }
 
         if (LastHttpContent.class.isInstance(message)) {
-            requestComplete = true;
-
-            if (responseComplete) {
+            if (!captured) {
                 capture();
             }
         }
@@ -48,8 +48,9 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
     @Override
     public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) {
         if (HttpResponse.class.isInstance(message)) {
-            this.response = new SpeakeasyNettyResponse(context, (HttpResponse) message);
-            this.response.register(writer);
+            HttpResponse httpResponse = (HttpResponse) message;
+            this.response = new SpeakeasyNettyResponse(httpResponse);
+            this.response.register(this.writer);
         }
 
         if (HttpContent.class.isInstance(message)) {
@@ -61,9 +62,7 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         }
 
         if (LastHttpContent.class.isInstance(message)) {
-            responseComplete = true;
-
-            if (requestComplete) {
+            if (!captured) {
                 capture();
             }
         }
@@ -71,7 +70,8 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         context.write(message, promise);
     }
 
-    private void capture() {
+    private synchronized void capture() {
+        captured = true;
         new SpeakeasyCapture().capture(request, response);
     }
 }

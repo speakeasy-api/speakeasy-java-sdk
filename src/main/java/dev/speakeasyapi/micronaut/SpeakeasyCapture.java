@@ -48,6 +48,9 @@ public class SpeakeasyCapture implements Runnable {
 
         if (context != null) {
             SpeakeasyMiddlewareController controller = context.getController();
+            if (!controller.isEnabled()) {
+                return;
+            }
 
             UriComponents uriComponents = UriComponentsBuilder
                     .fromUriString(this.request.getRequest().uri())
