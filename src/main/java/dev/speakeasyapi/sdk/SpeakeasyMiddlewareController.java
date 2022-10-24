@@ -4,7 +4,7 @@ import dev.speakeasyapi.accesstokens.Embedaccesstoken;
 import dev.speakeasyapi.sdk.client.ISpeakeasyClient;
 
 public class SpeakeasyMiddlewareController {
-    public static final String ControllerKey = "speakeasyMiddlewareController";
+    public static final String Key = "speakeasyMiddlewareController";
 
     private String pathHint = "";
     private String customerID = "";

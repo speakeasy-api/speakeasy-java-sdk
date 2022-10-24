@@ -1,4 +1,4 @@
-package dev.speakeasyapi;
+package dev.speakeasyapi.springboot;
 
 import java.util.concurrent.CountDownLatch;
 

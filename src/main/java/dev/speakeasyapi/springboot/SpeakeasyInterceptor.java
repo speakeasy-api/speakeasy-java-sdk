@@ -50,7 +50,7 @@ public class SpeakeasyInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        request.setAttribute(SpeakeasyMiddlewareController.ControllerKey,
+        request.setAttribute(SpeakeasyMiddlewareController.Key,
                 new SpeakeasyMiddlewareController(this.client));
         request.setAttribute(StartTimeKey, Instant.now());
 
@@ -60,7 +60,7 @@ public class SpeakeasyInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest req, HttpServletResponse res, Object handler, Exception ex) {
         SpeakeasyMiddlewareController controller = (SpeakeasyMiddlewareController) req
-                .getAttribute(SpeakeasyMiddlewareController.ControllerKey);
+                .getAttribute(SpeakeasyMiddlewareController.Key);
 
         String pathHint;
         if (StringUtils.hasText(controller.getPathHint())) {

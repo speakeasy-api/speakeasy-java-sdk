@@ -1,4 +1,4 @@
-package dev.speakeasyapi;
+package dev.speakeasyapi.springboot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.speakeasyapi.sdk.SpeakeasyConfig;
 import dev.speakeasyapi.sdk.SpeakeasyMiddlewareController;
-import dev.speakeasyapi.springboot.SpeakeasyFilter;
-import dev.speakeasyapi.springboot.SpeakeasyInterceptor;
 
 @WebMvcTest(controllers = { SpeakeasyInterceptorTest.TestPathController.class,
         SpeakeasyInterceptorTest.RootPathController.class })
@@ -218,7 +216,7 @@ class SpeakeasyInterceptorTest {
 
         @GetMapping("/manualPathHint")
         public String manualPathHint(
-                @RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller) {
+                @RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController controller) {
 
             controller.setPathHint("/my/manual/path/hint");
 
@@ -227,7 +225,7 @@ class SpeakeasyInterceptorTest {
 
         @PatchMapping("/getCustomerID")
         public String getCustomerID(
-                @RequestAttribute(SpeakeasyMiddlewareController.ControllerKey) SpeakeasyMiddlewareController controller) {
+                @RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController controller) {
 
             controller.setCustomerID("a-customers-id");
 
