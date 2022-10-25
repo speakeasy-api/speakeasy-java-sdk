@@ -43,6 +43,10 @@ public class SpeakeasyNettyRequest implements SpeakeasyRequest {
         return requestId;
     }
 
+    public void removeRequestId() {
+        this.request.headers().remove("X-Speakeasy-Request-Id");
+    }
+
     public HttpRequest getRequest() {
         return request;
     }

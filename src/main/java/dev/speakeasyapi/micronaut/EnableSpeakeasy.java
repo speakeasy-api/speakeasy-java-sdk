@@ -11,7 +11,7 @@ import io.micronaut.aop.Around;
 
 @Documented
 @Retention(RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ ElementType.METHOD, ElementType.TYPE })
 @Around
 public @interface EnableSpeakeasy {
 }

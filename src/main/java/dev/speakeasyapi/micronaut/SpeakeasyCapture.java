@@ -52,6 +52,8 @@ public class SpeakeasyCapture implements Runnable {
                 return;
             }
 
+            request.removeRequestId();
+
             UriComponents uriComponents = UriComponentsBuilder
                     .fromUriString(this.request.getRequest().uri())
                     .build();
@@ -78,7 +80,6 @@ public class SpeakeasyCapture implements Runnable {
             try {
                 context.getClient().ingestGrpc(harString, controller.getPathHint(), controller.getCustomerID());
             } catch (Exception e) {
-                e.printStackTrace();
                 logger.debug("speakeasy-sdk: Failed to ingest request:", e);
             }
         }

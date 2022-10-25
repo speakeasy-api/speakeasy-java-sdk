@@ -1,5 +1,6 @@
 package dev.speakeasyapi.micronaut;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 
@@ -67,70 +68,63 @@ public class EnableSpeakeasyInterceptor implements MethodInterceptor<Object, Obj
             }
         }
 
+        Method method = context.getTargetMethod();
+
         String methodPath = "";
 
-        if (context.hasAnnotation(CustomHttpMethod.class)) {
-            AnnotationValue<CustomHttpMethod> anno = context.getAnnotation(CustomHttpMethod.class);
+        if (method.isAnnotationPresent(CustomHttpMethod.class)) {
+            CustomHttpMethod anno = method.getAnnotation(CustomHttpMethod.class);
 
-            Optional<String> value = anno.get("value", String.class);
-            if (value.isPresent()) {
-                methodPath = value.get();
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Get.class)) {
-            AnnotationValue<Get> anno = context.getAnnotation(Get.class);
+        } else if (method.isAnnotationPresent(Get.class)) {
+            Get anno = method.getAnnotation(Get.class);
 
-            Optional<String> value = anno.get("value", String.class);
-            if (value.isPresent()) {
-                methodPath = value.get();
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Put.class)) {
-            AnnotationValue<Put> anno = context.getAnnotation(Put.class);
+        } else if (method.isAnnotationPresent(Post.class)) {
+            Post anno = method.getAnnotation(Post.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Post.class)) {
-            AnnotationValue<Post> anno = context.getAnnotation(Post.class);
+        } else if (method.isAnnotationPresent(Put.class)) {
+            Put anno = method.getAnnotation(Put.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Delete.class)) {
-            AnnotationValue<Delete> anno = context.getAnnotation(Delete.class);
+        } else if (method.isAnnotationPresent(Delete.class)) {
+            Delete anno = method.getAnnotation(Delete.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Patch.class)) {
-            AnnotationValue<Patch> anno = context.getAnnotation(Patch.class);
+        } else if (method.isAnnotationPresent(Head.class)) {
+            Head anno = method.getAnnotation(Head.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Trace.class)) {
-            AnnotationValue<Trace> anno = context.getAnnotation(Trace.class);
+        } else if (method.isAnnotationPresent(Options.class)) {
+            Options anno = method.getAnnotation(Options.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Head.class)) {
-            AnnotationValue<Head> anno = context.getAnnotation(Head.class);
+        } else if (method.isAnnotationPresent(Patch.class)) {
+            Patch anno = method.getAnnotation(Patch.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
-        } else if (context.hasAnnotation(Options.class)) {
-            AnnotationValue<Options> anno = context.getAnnotation(Options.class);
+        } else if (method.isAnnotationPresent(Trace.class)) {
+            Trace anno = method.getAnnotation(Trace.class);
 
-            Optional<String[]> value = anno.get("value", String[].class);
-            if (value.isPresent()) {
-                methodPath = value.get()[0];
+            if (anno.value() != "") {
+                methodPath = anno.value();
             }
         }
 

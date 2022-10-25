@@ -16,12 +16,18 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
     private SpeakeasyNettyRequest request;
     private SpeakeasyNettyResponse response;
     private SpeakeasyCaptureWriter writer;
+
+    private boolean requestCaptured = false;
+    private boolean responseCaptured = false;
     private boolean captured = false;
 
     @Override
     public void channelRead(final ChannelHandlerContext context, final Object message) {
         if (HttpRequest.class.isInstance(message)) {
-            captured = false;
+            this.captured = false;
+            this.requestCaptured = false;
+            this.responseCaptured = false;
+
             HttpRequest httpRequest = (HttpRequest) message;
             this.request = new SpeakeasyNettyRequest(httpRequest);
             this.writer = new SpeakeasyCaptureWriter();
@@ -37,7 +43,8 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         }
 
         if (LastHttpContent.class.isInstance(message)) {
-            if (!captured) {
+            this.requestCaptured = true;
+            if (!captured && this.responseCaptured) {
                 capture();
             }
         }
@@ -62,7 +69,8 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
         }
 
         if (LastHttpContent.class.isInstance(message)) {
-            if (!captured) {
+            this.responseCaptured = true;
+            if (!captured && this.requestCaptured) {
                 capture();
             }
         }
