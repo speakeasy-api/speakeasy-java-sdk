@@ -1,4 +1,4 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.implementation;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

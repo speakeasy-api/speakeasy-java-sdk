@@ -1,4 +1,4 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.implementation;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -13,9 +13,9 @@ import io.netty.handler.codec.http.LastHttpContent;
 
 @NotThreadSafe
 public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
-    private SpeakeasyNettyRequest request;
-    private SpeakeasyNettyResponse response;
-    private SpeakeasyCaptureWriter writer;
+    private SpeakeasyNettyRequest request = null;
+    private SpeakeasyNettyResponse response = null;
+    private SpeakeasyCaptureWriter writer = null;
 
     private boolean requestCaptured = false;
     private boolean responseCaptured = false;
@@ -32,6 +32,10 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
             this.request = new SpeakeasyNettyRequest(httpRequest);
             this.writer = new SpeakeasyCaptureWriter();
             this.request.register(this.writer);
+        }
+
+        if (this.request == null) {
+            return;
         }
 
         if (HttpContent.class.isInstance(message)) {
@@ -60,6 +64,10 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
             this.response.register(this.writer);
         }
 
+        if (this.response == null) {
+            return;
+        }
+
         if (HttpContent.class.isInstance(message)) {
             this.response.buffer(((HttpContent) message).content());
         }
@@ -79,7 +87,11 @@ public class SpeakeasyChannelDuplexHandler extends ChannelDuplexHandler {
     }
 
     private synchronized void capture() {
-        captured = true;
-        new SpeakeasyCapture().capture(request, response);
+        this.captured = true;
+        new SpeakeasyCapture().capture(this.request, this.response);
+
+        this.request = null;
+        this.response = null;
+        this.writer = null;
     }
 }

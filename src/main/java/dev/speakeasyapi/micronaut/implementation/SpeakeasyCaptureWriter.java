@@ -1,4 +1,4 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.implementation;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

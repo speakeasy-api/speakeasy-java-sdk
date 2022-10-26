@@ -1,4 +1,4 @@
-package dev.speakeasyapi.micronaut.integration;
+package dev.speakeasyapi.micronaut;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 

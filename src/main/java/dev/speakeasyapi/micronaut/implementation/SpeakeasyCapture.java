@@ -1,4 +1,4 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.implementation;
 
 import java.io.ByteArrayOutputStream;
 import java.time.Instant;

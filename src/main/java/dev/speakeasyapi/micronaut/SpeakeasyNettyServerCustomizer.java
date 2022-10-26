@@ -1,6 +1,6 @@
-package dev.speakeasyapi.micronaut.integration;
+package dev.speakeasyapi.micronaut;
 
-import dev.speakeasyapi.micronaut.SpeakeasyChannelDuplexHandler;
+import dev.speakeasyapi.micronaut.implementation.SpeakeasyChannelDuplexHandler;
 import io.micronaut.context.event.BeanCreatedEvent;
 import io.micronaut.context.event.BeanCreatedEventListener;
 import io.micronaut.http.netty.channel.ChannelPipelineCustomizer;

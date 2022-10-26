@@ -1,9 +1,10 @@
-package dev.speakeasyapi.micronaut.integration;
+package dev.speakeasyapi.micronaut;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 
+import dev.speakeasyapi.micronaut.implementation.SpeakeasySingleton;
 import dev.speakeasyapi.sdk.SpeakeasyMiddlewareController;
 import io.micronaut.aop.InterceptorBean;
 import io.micronaut.aop.MethodInterceptor;
@@ -25,10 +26,13 @@ import jakarta.inject.Singleton;
 @Singleton
 @InterceptorBean(EnableSpeakeasy.class)
 public class EnableSpeakeasyInterceptor implements MethodInterceptor<Object, Object> {
+    public static void Init(String apiKey, String apiID, String versionID) {
+        SpeakeasySingleton.getInstance().configure(apiKey, apiID, versionID);
+    }
+
     @Nullable
     @Override
     public Object intercept(MethodInvocationContext<Object, Object> context) {
-        System.out.println("intercept");
         Map<String, Object> parameters = context.getParameterValueMap();
 
         SpeakeasyMiddlewareController ctrl = null;
