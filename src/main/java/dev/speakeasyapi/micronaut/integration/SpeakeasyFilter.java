@@ -1,8 +1,10 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.integration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 
+import dev.speakeasyapi.micronaut.SpeakeasyRequestContext;
+import dev.speakeasyapi.micronaut.SpeakeasySingleton;
 import dev.speakeasyapi.sdk.SpeakeasyMiddlewareController;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
@@ -19,6 +21,7 @@ public class SpeakeasyFilter implements HttpServerFilter {
     public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
         return Flux
                 .from(Mono.fromCallable(() -> {
+                    System.out.println("doFilter");
                     String requestId = request.getHeaders().get("X-Speakeasy-Request-Id");
 
                     if (StringUtils.isNotEmpty(requestId)) {

@@ -1,4 +1,4 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.integration;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -28,6 +28,7 @@ public class EnableSpeakeasyInterceptor implements MethodInterceptor<Object, Obj
     @Nullable
     @Override
     public Object intercept(MethodInvocationContext<Object, Object> context) {
+        System.out.println("intercept");
         Map<String, Object> parameters = context.getParameterValueMap();
 
         SpeakeasyMiddlewareController ctrl = null;

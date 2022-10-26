@@ -1,5 +1,6 @@
-package dev.speakeasyapi.micronaut;
+package dev.speakeasyapi.micronaut.integration;
 
+import dev.speakeasyapi.micronaut.SpeakeasyChannelDuplexHandler;
 import io.micronaut.context.event.BeanCreatedEvent;
 import io.micronaut.context.event.BeanCreatedEventListener;
 import io.micronaut.http.netty.channel.ChannelPipelineCustomizer;
@@ -30,6 +31,7 @@ public class SpeakeasyNettyServerCustomizer implements BeanCreatedEventListener<
 
         @Override
         public void onStreamPipelineBuilt() {
+            System.out.println("onStreamPipelineBuilt");
             channel.pipeline().addBefore(ChannelPipelineCustomizer.HANDLER_HTTP_STREAM, "speakeasy",
                     new SpeakeasyChannelDuplexHandler());
         }
