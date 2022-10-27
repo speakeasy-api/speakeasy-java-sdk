@@ -3,12 +3,13 @@ package dev.speakeasyapi.micronaut.implementation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import dev.speakeasyapi.micronaut.SpeakeasyMicronautConfig;
 import dev.speakeasyapi.sdk.SpeakeasyConfig;
 
 public final class SpeakeasySingleton {
     private static SpeakeasySingleton INSTANCE;
 
-    private final SpeakeasyConfig cfg = new SpeakeasyConfig();
+    private final SpeakeasyConfig cfg = new SpeakeasyMicronautConfig();
     private final Map<String, SpeakeasyRequestContext> requests = new ConcurrentHashMap<>();
 
     private SpeakeasySingleton() {

@@ -21,7 +21,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
-import dev.speakeasyapi.sdk.SpeakeasyConfig;
 import dev.speakeasyapi.sdk.SpeakeasyMiddlewareController;
 import dev.speakeasyapi.sdk.client.ISpeakeasyClient;
 import dev.speakeasyapi.sdk.client.SpeakeasyClient;
@@ -33,11 +32,11 @@ public class SpeakeasyInterceptor implements HandlerInterceptor {
     private final ISpeakeasyClient client;
     private Logger logger = LoggerFactory.getLogger(SpeakeasyInterceptor.class);
 
-    public SpeakeasyInterceptor(SpeakeasyConfig cfg) {
+    public SpeakeasyInterceptor(SpeakeasySpringBootConfig cfg) {
         this(cfg, null);
     }
 
-    public SpeakeasyInterceptor(SpeakeasyConfig cfg, ISpeakeasyClient client) {
+    public SpeakeasyInterceptor(SpeakeasySpringBootConfig cfg, ISpeakeasyClient client) {
         pool = Executors.newCachedThreadPool();
 
         if (!cfg.isIngestEnabled()) {

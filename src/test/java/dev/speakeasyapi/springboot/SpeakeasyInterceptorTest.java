@@ -50,7 +50,7 @@ class SpeakeasyInterceptorTest {
         this.mockMvc = MockMvcBuilders
                 .standaloneSetup(new SpeakeasyInterceptorTest.TestPathController(),
                         new SpeakeasyInterceptorTest.RootPathController())
-                .addInterceptors(new SpeakeasyInterceptor(new SpeakeasyConfig(), client))
+                .addInterceptors(new SpeakeasyInterceptor(new SpeakeasySpringBootConfig(), client))
                 .addFilter(new SpeakeasyFilter())
                 .build();
     }
