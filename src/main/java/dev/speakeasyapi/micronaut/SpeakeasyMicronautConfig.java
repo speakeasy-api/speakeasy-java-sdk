@@ -68,12 +68,12 @@ public class SpeakeasyMicronautConfig extends SpeakeasyConfig {
             throw new IllegalArgumentException("The application.yml file was not found in the resources directory.");
         }
         Map<String, Object> properties = yaml.load(inputStream);
-        Map<String,String> speakeasyProperties = (Map<String, String>) properties.get("speakeasyApi");
+        Map<String,String> speakeasyProperties = (Map<String, String>) properties.get("speakeasy");
         if (speakeasyProperties == null) {
             throw new IllegalArgumentException("The speakeasyApi property was not found in the application.yml.");
         }
-        apiKey = speakeasyProperties.get("apiKey");
-        apiID = speakeasyProperties.get("apiID");
-        versionID = speakeasyProperties.get("versionID");
+        apiKey = speakeasyProperties.get("api-key");
+        apiID = speakeasyProperties.get("api-id");
+        versionID = speakeasyProperties.get("version-id");
     }
 }
