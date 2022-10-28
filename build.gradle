@@ -29,7 +29,7 @@ dependencies {
     compileOnly(group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.7.4') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
-    implementation('org.slf4j:slf4j-api:1.7.36')
+    implementation('org.slf4j:slf4j-api:2.0.3')
     runtimeOnly 'io.netty:netty-tcnative-boringssl-static:2.0.20.Final'
     implementation 'io.grpc:grpc-netty-shaded:1.45.1'
     implementation 'io.grpc:grpc-protobuf:1.45.1'
