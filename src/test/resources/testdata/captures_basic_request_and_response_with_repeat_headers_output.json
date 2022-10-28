@@ -3,7 +3,7 @@
     "comment": "request capture for http://test.com/test",
     "creator": {
       "name": "speakeasy-java-sdk",
-      "version": "1.2.3"
+      "version": "1.3.0"
     },
     "version": "1.2",
     "entries": [
@@ -17,15 +17,15 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Vary",
+              "name": "vary",
               "value": "Origin"
             },
             {
-              "name": "Vary",
+              "name": "vary",
               "value": "Access-Control-Request-Method"
             },
             {
-              "name": "Vary",
+              "name": "vary",
               "value": "Access-Control-Request-Headers"
             }
           ],
@@ -40,23 +40,23 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Content-Length",
+              "name": "content-length",
               "value": "4"
             },
             {
-              "name": "Content-Type",
+              "name": "content-type",
               "value": "application/octet-stream"
             },
             {
-              "name": "Vary",
+              "name": "vary",
               "value": "Origin"
             },
             {
-              "name": "Vary",
+              "name": "vary",
               "value": "Access-Control-Request-Method"
             },
             {
-              "name": "Vary",
+              "name": "vary",
               "value": "Access-Control-Request-Headers"
             }
           ],

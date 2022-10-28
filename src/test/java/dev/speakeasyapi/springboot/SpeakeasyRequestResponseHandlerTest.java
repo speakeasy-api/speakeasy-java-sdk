@@ -1,4 +1,4 @@
-package dev.speakeasyapi;
+package dev.speakeasyapi.springboot;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,20 +28,15 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dev.speakeasyapi.springboot.RequestResponseCaptureWatcher;
-import dev.speakeasyapi.springboot.SpeakeasyRequestResponseHandler;
-import dev.speakeasyapi.springboot.SpeakeasyRequestWrapper;
-import dev.speakeasyapi.springboot.SpeakeasyResponseWrapper;
-
 @DisplayName("Succeeds with speakeasy har test fixtures")
-public class SpeakeasyHarBuilderTestFixtures {
+public class SpeakeasyRequestResponseHandlerTest {
 
     private static Stream<Arguments> testProvider() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
         Stream.Builder<Arguments> tests = Stream.builder();
 
-        URI uri = SpeakeasyHarBuilderTestFixtures.class.getResource("/testdata").toURI();
+        URI uri = SpeakeasyRequestResponseHandlerTest.class.getResource("/testdata").toURI();
         Path dirPath = Paths.get(uri);
         Files.list(dirPath).forEach(p -> {
             assertDoesNotThrow(() -> {
@@ -132,7 +127,7 @@ public class SpeakeasyHarBuilderTestFixtures {
 
         TestSpeakeasyClient client = new TestSpeakeasyClient();
         SpeakeasyRequestResponseHandler handler = new SpeakeasyRequestResponseHandler(client,
-                LoggerFactory.getLogger(SpeakeasyHarBuilderTestFixtures.class),
+                LoggerFactory.getLogger(SpeakeasyRequestResponseHandlerTest.class),
                 wrappedRequest, wrappedResponse, watcher, startTime, endTime, null, null);
         handler.run();
 

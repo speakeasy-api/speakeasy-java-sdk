@@ -10,37 +10,37 @@
     "response_body": "test",
     "headers": [
       {
-        "key": "Vary",
+        "key": "vary",
         "values": ["Origin"]
       },
       {
-        "key": "Vary",
+        "key": "vary",
         "values": ["Access-Control-Request-Method"]
       },
       {
-        "key": "Vary",
+        "key": "vary",
         "values": ["Access-Control-Request-Headers"]
       }
     ],
     "response_headers": [
       {
-        "key": "Vary",
+        "key": "vary",
         "values": ["Origin"]
       },
       {
-        "key": "Vary",
+        "key": "vary",
         "values": ["Access-Control-Request-Method"]
       },
       {
-        "key": "Vary",
+        "key": "vary",
         "values": ["Access-Control-Request-Headers"]
       },
       {
-        "key": "Content-Type",
+        "key": "content-type",
         "values": ["application/octet-stream"]
       },
       {
-        "key": "Content-Length",
+        "key": "content-length",
         "values": ["4"]
       }
     ]

@@ -10,14 +10,10 @@ import org.slf4j.Logger;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.smartbear.har.model.HarCreator;
-
 import dev.speakeasyapi.sdk.SpeakeasyHarBuilder;
 import dev.speakeasyapi.sdk.client.ISpeakeasyClient;
 
 public class SpeakeasyRequestResponseHandler implements Runnable {
-    private final String sdkName = "speakeasy-java-sdk";
-    private final String speakeasyVersion = "1.2.3";
     private final ISpeakeasyClient speakeasyClient;
     private final Logger logger;
     private final HttpServletRequest request;
@@ -53,18 +49,15 @@ public class SpeakeasyRequestResponseHandler implements Runnable {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try {
-            new SpeakeasyHarBuilder()
+            new SpeakeasyHarBuilder(this.logger)
                     .withStartTime(this.startTime)
                     .withEndTime(this.endTime)
                     .withComment(String.format("request capture for %s", this.request.getRequestURI()))
-                    .withCreator(new HarCreator(this.sdkName, "", this.speakeasyVersion))
                     .withHostName(uriComponents.getHost())
                     .withOutputStream(outputStream)
                     .withPort(uriComponents.getPort())
-                    .withRequest(this.request, this.watcher.getRequestCache(), this.watcher.getRequestIsValid(),
-                            this.logger)
-                    .withResponse(this.response, this.watcher.getResponseCache(), this.watcher.getResponseIsValid(),
-                            this.request.getProtocol(), this.logger)
+                    .withRequest(new SpeakeasyServletRequest(this.request, this.watcher))
+                    .withResponse(new SpeakeasyServletResponse(this.response, this.watcher), this.request.getProtocol())
                     .build();
         } catch (Exception e) {
             logger.debug("speakeasy-sdk: Failed to build Har file", e);

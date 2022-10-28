@@ -1,4 +1,4 @@
-package dev.speakeasyapi;
+package dev.speakeasyapi.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

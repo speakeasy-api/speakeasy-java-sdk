@@ -3,7 +3,7 @@
     "version": "1.2",
     "creator": {
       "name": "speakeasy-java-sdk",
-      "version": "1.2.3"
+      "version": "1.3.0"
     },
     "entries": [
       {
@@ -16,15 +16,15 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Accept-Encoding",
+              "name": "accept-encoding",
               "value": "gzip, deflate"
             },
             {
-              "name": "Connection",
+              "name": "connection",
               "value": "close"
             },
             {
-              "name": "Host",
+              "name": "host",
               "value": "test.com"
             }
           ],
@@ -44,11 +44,11 @@
           "cookies": [],
           "headers": [
             {
-              "name": "Content-Length",
+              "name": "content-length",
               "value": "4"
             },
             {
-              "name": "Content-Type",
+              "name": "content-type",
               "value": "application/octet-stream"
             }
           ],

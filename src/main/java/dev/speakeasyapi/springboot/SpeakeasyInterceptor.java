@@ -21,49 +21,37 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
+import dev.speakeasyapi.sdk.SpeakeasyConfig;
 import dev.speakeasyapi.sdk.SpeakeasyMiddlewareController;
 import dev.speakeasyapi.sdk.client.ISpeakeasyClient;
 import dev.speakeasyapi.sdk.client.SpeakeasyClient;
 
 public class SpeakeasyInterceptor implements HandlerInterceptor {
-    public static final String ControllerKey = "speakeasyMiddlewareController";
     public static final String StartTimeKey = "speakeasyStartTime";
 
     private Executor pool;
     private final ISpeakeasyClient client;
-    private String serverUrl = "grpc.prod.speakeasyapi.dev:443";
     private Logger logger = LoggerFactory.getLogger(SpeakeasyInterceptor.class);
 
-    public SpeakeasyInterceptor(String apiKey, String apiID, String versionID) {
-        this(apiKey, apiID, versionID, null);
+    public SpeakeasyInterceptor(SpeakeasyConfig cfg) {
+        this(cfg, null);
     }
 
-    public SpeakeasyInterceptor(String apiKey, String apiID, String versionID, ISpeakeasyClient client) {
+    public SpeakeasyInterceptor(SpeakeasyConfig cfg, ISpeakeasyClient client) {
         pool = Executors.newCachedThreadPool();
 
-        String serverURL = System.getenv("SPEAKEASY_SERVER_URL");
-        if (serverURL != null) {
-            this.serverUrl = serverURL;
-        }
-
-        boolean secureGrpc = true;
-        if ("false".equals(System.getenv("SPEAKEASY_SERVER_SECURE"))) {
-            secureGrpc = false;
-        }
-
-        boolean disableIngest = false;
-        if ("true".equals(System.getenv("SPEAKEASY_TEST_MODE"))) {
+        if (!cfg.isIngestEnabled()) {
             pool = MoreExecutors.directExecutor();
-            disableIngest = true;
         }
 
         this.client = client != null ? client
-                : new SpeakeasyClient(apiKey, apiID, versionID, this.serverUrl, secureGrpc, disableIngest);
+                : new SpeakeasyClient(cfg);
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        request.setAttribute(ControllerKey, new SpeakeasyMiddlewareController(this.client));
+        request.setAttribute(SpeakeasyMiddlewareController.Key,
+                new SpeakeasyMiddlewareController(this.client));
         request.setAttribute(StartTimeKey, Instant.now());
 
         return true;
@@ -71,7 +59,8 @@ public class SpeakeasyInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest req, HttpServletResponse res, Object handler, Exception ex) {
-        SpeakeasyMiddlewareController controller = (SpeakeasyMiddlewareController) req.getAttribute(ControllerKey);
+        SpeakeasyMiddlewareController controller = (SpeakeasyMiddlewareController) req
+                .getAttribute(SpeakeasyMiddlewareController.Key);
 
         String pathHint;
         if (StringUtils.hasText(controller.getPathHint())) {
