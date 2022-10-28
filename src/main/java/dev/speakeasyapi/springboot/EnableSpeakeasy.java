@@ -7,13 +7,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import dev.speakeasyapi.sdk.SpeakeasyConfig;
 
 @Configuration
 @ConfigurationProperties(prefix = "speakeasy-api")
 @ConfigurationPropertiesScan
 @Import(SpeakeasyFilter.class)
 public class EnableSpeakeasy implements WebMvcConfigurer {
-    private SpeakeasySpringBootConfig cfg = new SpeakeasySpringBootConfig();
+    private SpeakeasyConfig cfg = new SpeakeasyConfig();
 
     public void setApiKey(String apiKey) {
         this.cfg.setApiKey(apiKey);

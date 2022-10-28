@@ -33,7 +33,7 @@ import com.smartbear.har.model.HarTimings;
 
 public class SpeakeasyHarBuilder {
     private final String sdkName = "speakeasy-java-sdk";
-    private final String speakeasyVersion = "1.2.3";
+    private final String speakeasyVersion = "1.3.0";
     private final String droppedBodyText = "--dropped--";
 
     private final DefaultHarStreamWriter.Builder harWriterBuilder;

@@ -26,9 +26,13 @@ import jakarta.inject.Singleton;
 @Singleton
 @InterceptorBean(EnableSpeakeasy.class)
 public class EnableSpeakeasyInterceptor implements MethodInterceptor<Object, Object> {
-//    public static void Init(String apiKey, String apiID, String versionID) {
-//        SpeakeasySingleton.getInstance().configure(apiKey, apiID, versionID);
-//    }
+    public static void configure(String apiID, String versionID) {
+        SpeakeasySingleton.getInstance().configure(null, apiID, versionID);
+    }
+
+    public static void configure(String apiID, String versionID, String apiKey) {
+        SpeakeasySingleton.getInstance().configure(apiKey, apiID, versionID);
+    }
 
     @Nullable
     @Override
