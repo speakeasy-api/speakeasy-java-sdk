@@ -61,14 +61,14 @@ public class SpeakeasyMiddlewareController {
     }
 
     public String getPortalLoginToken(String customerId, String displayName, Map<String, String> jwtCustomClaims,
-            List<String> permissions, List<Filter> filters) throws RuntimeException {
+            Map<String, Boolean> permissions, List<Filter> filters) throws RuntimeException {
         Embedaccesstoken.EmbedAccessTokenRequest request = Embedaccesstoken.EmbedAccessTokenRequest
                 .newBuilder()
                 .addAllFilters(filters)
                 .setCustomerId(customerId)
                 .setDisplayName(displayName)
                 .putAllJwtCustomClaims(jwtCustomClaims)
-                .addAllPermissions(permissions)
+                .putAllPermissions(permissions)
                 .build();
 
         return client.getEmbedAccessToken(request).getAccessToken();
