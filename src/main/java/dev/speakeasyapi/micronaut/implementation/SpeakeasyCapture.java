@@ -1,14 +1,13 @@
 package dev.speakeasyapi.micronaut.implementation;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URL;
 import java.time.Instant;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -54,19 +53,17 @@ public class SpeakeasyCapture implements Runnable {
 
             request.removeRequestId();
 
-            UriComponents uriComponents = UriComponentsBuilder
-                    .fromUriString(this.request.getRequest().uri())
-                    .build();
-
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try {
+                URL url = new URL(this.request.getRequest().uri());
+
                 new SpeakeasyHarBuilder(this.logger)
                         .withStartTime(context.getStartTime())
                         .withEndTime(endTime)
-                        .withHostName(uriComponents.getHost())
+                        .withHostName(url.getHost())
                         .withOutputStream(outputStream)
-                        .withPort(uriComponents.getPort())
+                        .withPort(url.getPort())
                         .withMasking(controller.getMasking())
                         .withRequest(this.request)
                         .withResponse(this.response, this.request.getProtocol())
