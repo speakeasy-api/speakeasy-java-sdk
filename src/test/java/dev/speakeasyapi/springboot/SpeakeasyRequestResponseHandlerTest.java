@@ -28,6 +28,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dev.speakeasyapi.sdk.masking.Masking;
+
 @DisplayName("Succeeds with speakeasy har test fixtures")
 public class SpeakeasyRequestResponseHandlerTest {
 
@@ -125,10 +127,48 @@ public class SpeakeasyRequestResponseHandlerTest {
 
         Instant endTime = startTime.plus(test.Args.ElapsedTime != 0 ? test.Args.ElapsedTime : 1, ChronoUnit.MILLIS);
 
+        Masking.Builder maskingBuilder = Masking.builder();
+
+        if (test.Args.QueryStringMasks != null) {
+            maskingBuilder.maskQueryStrings(test.Args.QueryStringMasks);
+        }
+
+        if (test.Args.RequestHeaderMasks != null) {
+            maskingBuilder.maskRequestHeaders(test.Args.RequestHeaderMasks);
+        }
+
+        if (test.Args.RequestCookieMasks != null) {
+            maskingBuilder.maskRequestCookies(test.Args.RequestCookieMasks);
+        }
+
+        if (test.Args.RequestFieldMasksString != null) {
+            maskingBuilder.maskRequestBodyStrings(test.Args.RequestFieldMasksString);
+        }
+
+        if (test.Args.RequestFieldMasksNumber != null) {
+            maskingBuilder.maskRequestBodyNumbers(test.Args.RequestFieldMasksNumber);
+        }
+
+        if (test.Args.ResponseHeaderMasks != null) {
+            maskingBuilder.maskResponseHeaders(test.Args.ResponseHeaderMasks);
+        }
+
+        if (test.Args.ResponseCookieMasks != null) {
+            maskingBuilder.maskResponseCookies(test.Args.ResponseCookieMasks);
+        }
+
+        if (test.Args.ResponseFieldMasksString != null) {
+            maskingBuilder.maskResponseBodyStrings(test.Args.ResponseFieldMasksString);
+        }
+
+        if (test.Args.ResponseFieldMasksNumber != null) {
+            maskingBuilder.maskResponseBodyNumbers(test.Args.ResponseFieldMasksNumber);
+        }
+
         TestSpeakeasyClient client = new TestSpeakeasyClient();
         SpeakeasyRequestResponseHandler handler = new SpeakeasyRequestResponseHandler(client,
                 LoggerFactory.getLogger(SpeakeasyRequestResponseHandlerTest.class),
-                wrappedRequest, wrappedResponse, watcher, startTime, endTime, null, null);
+                wrappedRequest, wrappedResponse, watcher, maskingBuilder.build(), startTime, endTime, null, null);
         handler.run();
 
         ObjectMapper om = new ObjectMapper();
@@ -170,6 +210,24 @@ class Args {
     public String ResponseBody;
     @JsonProperty("response_headers")
     public Header[] ResponseHeaders;
+    @JsonProperty("query_string_masks")
+    public Map<String, String> QueryStringMasks;
+    @JsonProperty("request_header_masks")
+    public Map<String, String> RequestHeaderMasks;
+    @JsonProperty("request_cookie_masks")
+    public Map<String, String> RequestCookieMasks;
+    @JsonProperty("request_field_masks_string")
+    public Map<String, String> RequestFieldMasksString;
+    @JsonProperty("request_field_masks_number")
+    public Map<String, String> RequestFieldMasksNumber;
+    @JsonProperty("response_header_masks")
+    public Map<String, String> ResponseHeaderMasks;
+    @JsonProperty("response_cookie_masks")
+    public Map<String, String> ResponseCookieMasks;
+    @JsonProperty("response_field_masks_string")
+    public Map<String, String> ResponseFieldMasksString;
+    @JsonProperty("response_field_masks_number")
+    public Map<String, String> ResponseFieldMasksNumber;
 }
 
 class TestFixture {

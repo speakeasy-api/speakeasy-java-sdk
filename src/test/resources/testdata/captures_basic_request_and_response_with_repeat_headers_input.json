@@ -10,37 +10,41 @@
     "response_body": "test",
     "headers": [
       {
-        "key": "vary",
+        "key": "Host",
+        "values": ["test.com"]
+      },
+      {
+        "key": "Vary",
         "values": ["Origin"]
       },
       {
-        "key": "vary",
+        "key": "Vary",
         "values": ["Access-Control-Request-Method"]
       },
       {
-        "key": "vary",
+        "key": "Vary",
         "values": ["Access-Control-Request-Headers"]
       }
     ],
     "response_headers": [
       {
-        "key": "vary",
+        "key": "Vary",
         "values": ["Origin"]
       },
       {
-        "key": "vary",
+        "key": "Vary",
         "values": ["Access-Control-Request-Method"]
       },
       {
-        "key": "vary",
+        "key": "Vary",
         "values": ["Access-Control-Request-Headers"]
       },
       {
-        "key": "content-type",
+        "key": "Content-Type",
         "values": ["application/octet-stream"]
       },
       {
-        "key": "content-length",
+        "key": "Content-Length",
         "values": ["4"]
       }
     ]

@@ -1,12 +1,12 @@
 package dev.speakeasyapi.sdk.models;
 
-public enum SpeakeasyEmbedAccessTokenRequestFilterKey {
+public enum SpeakeasyAccessTokenFilterKey {
     Created("created_at"),
     CustomerId("customer_id");
 
     private String value;
 
-    SpeakeasyEmbedAccessTokenRequestFilterKey(String value) {
+    SpeakeasyAccessTokenFilterKey(String value) {
         this.value = value;
     }
 

@@ -64,10 +64,10 @@ public class SpeakeasyCapture implements Runnable {
                 new SpeakeasyHarBuilder(this.logger)
                         .withStartTime(context.getStartTime())
                         .withEndTime(endTime)
-                        .withComment(String.format("request capture for %s", this.request.getRequest().uri()))
                         .withHostName(uriComponents.getHost())
                         .withOutputStream(outputStream)
                         .withPort(uriComponents.getPort())
+                        .withMasking(controller.getMasking())
                         .withRequest(this.request)
                         .withResponse(this.response, this.request.getProtocol())
                         .build();
@@ -78,7 +78,8 @@ public class SpeakeasyCapture implements Runnable {
 
             String harString = outputStream.toString();
             try {
-                context.getClient().ingestGrpc(harString, controller.getPathHint(), controller.getCustomerID());
+                context.getClient().ingestGrpc(harString, controller.getPathHint(), controller.getCustomerID(),
+                        controller.getMasking());
             } catch (Exception e) {
                 logger.debug("speakeasy-sdk: Failed to ingest request:", e);
             }

@@ -7,8 +7,10 @@ import javax.net.ssl.SSLException;
 import dev.speakeasyapi.accesstokens.EmbedAccessTokenServiceGrpc;
 import dev.speakeasyapi.accesstokens.Embedaccesstoken;
 import dev.speakeasyapi.schemas.Ingest;
+import dev.speakeasyapi.schemas.Ingest.IngestRequest.MaskingMetadata;
 import dev.speakeasyapi.schemas.IngestServiceGrpc;
 import dev.speakeasyapi.sdk.SpeakeasyConfig;
+import dev.speakeasyapi.sdk.masking.Masking;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
@@ -27,7 +29,7 @@ public class SpeakeasyClient implements ISpeakeasyClient {
     }
 
     @Override
-    public void ingestGrpc(String harString, String pathHint, String customerID)
+    public void ingestGrpc(String harString, String pathHint, String customerID, Masking masking)
             throws RuntimeException {
         if (!this.cfg.isIngestEnabled()) {
             return;
@@ -38,10 +40,23 @@ public class SpeakeasyClient implements ISpeakeasyClient {
 
             IngestServiceGrpc.IngestServiceBlockingStub blockingStub = IngestServiceGrpc.newBlockingStub(channel);
 
+            MaskingMetadata maskingMetadata = MaskingMetadata.newBuilder()
+                    .putAllQueryStringMasks(masking.getQueryStringMasks())
+                    .putAllRequestHeaderMasks(masking.getRequestHeaderMasks())
+                    .putAllResponseHeaderMasks(masking.getResponseHeaderMasks())
+                    .putAllRequestCookieMasks(masking.getRequestCookieMasks())
+                    .putAllResponseCookieMasks(masking.getResponseCookieMasks())
+                    .putAllRequestFieldMasksString(masking.getRequestBodyMasksString())
+                    .putAllRequestFieldMasksNumber(masking.getRequestBodyMasksNumber())
+                    .putAllResponseFieldMasksString(masking.getResponseBodyMasksString())
+                    .putAllResponseFieldMasksNumber(masking.getResponseBodyMasksNumber())
+                    .build();
+
             Ingest.IngestRequest.Builder ingestRequestBuilder = Ingest.IngestRequest.newBuilder()
                     .setHar(harString)
                     .setApiId(this.cfg.getApiID())
                     .setVersionId(this.cfg.getVersionID())
+                    .setMaskingMetadata(maskingMetadata)
                     .setPathHint(pathHint);
             if (customerID != null) {
                 ingestRequestBuilder.setCustomerId(customerID);

@@ -162,14 +162,14 @@ public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddleware
         // populate your customerId
 
         // Restrict data by customer id
-        SpeakeasyEmbedAccessTokenRequestBuilder requestBuilder = new SpeakeasyEmbedAccessTokenRequestBuilder();
-        requestBuilder.withCustomerFilter(customerId);
+        SpeakeasyAccessTokenFilterBuilder filterBuilder = new SpeakeasyAccessTokenFilterBuilder();
+        filterBuilder.withCustomerFilter(customerId);
 
         // Restrict data by time (last 24 hours)
         Instant startTime=Instant.now().minusSeconds(60*60*24);
-        requestBuilder.withTimeFilter(startTime,SpeakeasyEmbedAccessTokenRequestFilterOperator.GreaterThan);
+        filterBuilder.withTimeFilter(startTime,SpeakeasyAccessTokenFilterOperator.GreaterThan);
 
-        String embedAccessToken=controller.getEmbedAccessToken(requestBuilder.build());
+        String embedAccessToken=controller.getEmbedAccessToken(filterBuilder.build());
 
         // build response
         }

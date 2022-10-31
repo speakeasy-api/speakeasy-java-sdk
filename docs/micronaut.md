@@ -184,23 +184,23 @@ Below are some examples on how to generate access tokens:
 
 ```java
 @Get("/embed_access_token")
-public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController ctrl){
+public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController controller){
         String customerId=null;
 
         // populate your customerId
 
         // Restrict data by customer id
-        SpeakeasyEmbedAccessTokenRequestBuilder requestBuilder = new SpeakeasyEmbedAccessTokenRequestBuilder();
-        requestBuilder.withCustomerFilter(customerId);
+        SpeakeasyAccessTokenFilterBuilder filterBuilder = new SpeakeasyAccessTokenFilterBuilder();
+        filterBuilder.withCustomerFilter(customerId);
 
         // Restrict data by time (last 24 hours)
         Instant startTime=Instant.now().minusSeconds(60*60*24);
-        requestBuilder.withTimeFilter(startTime,SpeakeasyEmbedAccessTokenRequestFilterOperator.GreaterThan);
+        filterBuilder.withTimeFilter(startTime,SpeakeasyAccessTokenFilterOperator.GreaterThan);
 
-        String embedAccessToken=ctrl.getEmbedAccessToken(requestBuilder.build());
+        String embedAccessToken=controller.getEmbedAccessToken(filterBuilder.build());
 
         // build response
-}
+        }
 ```
 
 ## Setting up for Tests
