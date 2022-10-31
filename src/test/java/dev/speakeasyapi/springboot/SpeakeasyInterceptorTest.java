@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -66,7 +68,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/test/requestMapping", client.PathHint);
     }
@@ -82,7 +84,7 @@ class SpeakeasyInterceptorTest {
         result.andExpect(status().isOk()); // .andExpect(content().string(id)); TODO: figure out why response body is
         // empty
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/test/requestMapping/{id}", client.PathHint);
     }
@@ -94,7 +96,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/test/getMapping", client.PathHint);
     }
@@ -106,7 +108,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/test/postMapping", client.PathHint);
     }
@@ -118,7 +120,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/putMapping", client.PathHint);
     }
@@ -130,7 +132,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/deleteMapping", client.PathHint);
     }
@@ -142,7 +144,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/patchMapping", client.PathHint);
     }
@@ -154,7 +156,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("/my/manual/path/hint", client.PathHint);
     }
@@ -166,7 +168,7 @@ class SpeakeasyInterceptorTest {
         ResultActions result = mockMvc.perform(req);
         result.andExpect(status().isOk());
 
-        client.latch.await();
+        client.latch.await(1, TimeUnit.SECONDS);
 
         assertEquals("a-customers-id", client.CustomerID);
     }

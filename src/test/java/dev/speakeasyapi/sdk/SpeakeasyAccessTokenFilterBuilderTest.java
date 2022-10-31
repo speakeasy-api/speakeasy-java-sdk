@@ -8,23 +8,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import dev.speakeasyapi.sdk.models.SpeakeasyEmbedAccessTokenRequestBuilder;
-import dev.speakeasyapi.sdk.models.SpeakeasyEmbedAccessTokenRequestFilterKey;
-import dev.speakeasyapi.sdk.models.SpeakeasyEmbedAccessTokenRequestFilterOperator;
+import dev.speakeasyapi.sdk.models.SpeakeasyAccessTokenFilterBuilder;
+import dev.speakeasyapi.sdk.models.SpeakeasyAccessTokenFilterKey;
+import dev.speakeasyapi.sdk.models.SpeakeasyAccessTokenFilterOperator;
 
 @DisplayName("SpeakeasyEmbedAccessTokenRequestBuilderTest")
-public class SpeakeasyEmbedAccessTokenRequestBuilderTest {
-    private SpeakeasyEmbedAccessTokenRequestBuilder builder;
+public class SpeakeasyAccessTokenFilterBuilderTest {
+    private SpeakeasyAccessTokenFilterBuilder builder;
 
     @BeforeEach
     public void setup() {
-        builder = new SpeakeasyEmbedAccessTokenRequestBuilder();
+        builder = new SpeakeasyAccessTokenFilterBuilder();
     }
 
     @Test
     public void appliesSingleFilter() {
-        this.builder.withFilter(SpeakeasyEmbedAccessTokenRequestFilterKey.CustomerId,
-                SpeakeasyEmbedAccessTokenRequestFilterOperator.Equality,
+        this.builder.withFilter(SpeakeasyAccessTokenFilterKey.CustomerId,
+                SpeakeasyAccessTokenFilterOperator.Equality,
                 "test-customer");
 
         assertEquals("customer_id:=:test-customer", this.builder.toString());
@@ -32,8 +32,8 @@ public class SpeakeasyEmbedAccessTokenRequestBuilderTest {
 
     @Test
     public void appliesGreaterLessThanFilters() {
-        this.builder.withGreaterThanFilter(SpeakeasyEmbedAccessTokenRequestFilterKey.Created, "yesterday");
-        this.builder.withLessThanFilter(SpeakeasyEmbedAccessTokenRequestFilterKey.Created, "today");
+        this.builder.withGreaterThanFilter(SpeakeasyAccessTokenFilterKey.Created, "yesterday");
+        this.builder.withLessThanFilter(SpeakeasyAccessTokenFilterKey.Created, "today");
 
         assertEquals("created_at:>:yesterday;created_at:<:today", this.builder.toString());
     }
@@ -48,7 +48,7 @@ public class SpeakeasyEmbedAccessTokenRequestBuilderTest {
     @Test
     public void appliesTimeFilter() {
         Instant time = Instant.now();
-        this.builder.withTimeFilter(time, SpeakeasyEmbedAccessTokenRequestFilterOperator.LessThan);
+        this.builder.withTimeFilter(time, SpeakeasyAccessTokenFilterOperator.LessThan);
 
         assertEquals(String.format("created_at:<:%s", time), this.builder.toString());
     }

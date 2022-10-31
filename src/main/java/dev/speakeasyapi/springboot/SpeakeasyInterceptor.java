@@ -73,7 +73,8 @@ public class SpeakeasyInterceptor implements HandlerInterceptor {
                 .getAttribute(SpeakeasyRequestWrapper.speakeasyRequestResponseWatcherAttribute);
 
         pool.execute(new SpeakeasyRequestResponseHandler(this.client, this.logger,
-                req, res, watcher, startTime, Instant.now(), pathHint, controller.getCustomerID()));
+                req, res, watcher, controller.getMasking(), startTime, Instant.now(), pathHint,
+                controller.getCustomerID()));
     }
 
     private static String getPathHint(HandlerMethod hm) {

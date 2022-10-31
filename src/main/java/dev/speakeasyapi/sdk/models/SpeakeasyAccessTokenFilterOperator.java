@@ -1,13 +1,13 @@
 package dev.speakeasyapi.sdk.models;
 
-public enum SpeakeasyEmbedAccessTokenRequestFilterOperator {
+public enum SpeakeasyAccessTokenFilterOperator {
     Equality("="),
     GreaterThan(">"),
     LessThan("<");
 
     private String value;
 
-    SpeakeasyEmbedAccessTokenRequestFilterOperator(String value) {
+    SpeakeasyAccessTokenFilterOperator(String value) {
         this.value = value;
     }
 

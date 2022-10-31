@@ -4,6 +4,7 @@ import java.util.concurrent.CountDownLatch;
 
 import dev.speakeasyapi.accesstokens.Embedaccesstoken;
 import dev.speakeasyapi.sdk.client.ISpeakeasyClient;
+import dev.speakeasyapi.sdk.masking.Masking;
 
 class TestSpeakeasyClient implements ISpeakeasyClient {
     public String HarString;
@@ -12,7 +13,7 @@ class TestSpeakeasyClient implements ISpeakeasyClient {
     public CountDownLatch latch = new CountDownLatch(1);
 
     @Override
-    public void ingestGrpc(String harString, String pathHint, String customerID) {
+    public void ingestGrpc(String harString, String pathHint, String customerID, Masking masking) {
         this.HarString = harString;
         this.PathHint = pathHint;
         this.CustomerID = customerID;

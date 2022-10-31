@@ -2,10 +2,17 @@ package dev.speakeasyapi.sdk;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +38,8 @@ import com.smartbear.har.model.HarRequest;
 import com.smartbear.har.model.HarResponse;
 import com.smartbear.har.model.HarTimings;
 
+import dev.speakeasyapi.sdk.masking.Masking;
+
 public class SpeakeasyHarBuilder {
     private final String sdkName = "speakeasy-java-sdk";
     private final String speakeasyVersion = "1.3.0";
@@ -39,6 +48,8 @@ public class SpeakeasyHarBuilder {
     private final DefaultHarStreamWriter.Builder harWriterBuilder;
 
     private final Logger logger;
+
+    private Masking masking = null;
 
     public SpeakeasyHarBuilder(Logger logger) {
         this.harWriterBuilder = new DefaultHarStreamWriter.Builder();
@@ -49,12 +60,6 @@ public class SpeakeasyHarBuilder {
 
     public OutputStream getOutputStream() {
         return this.outputStream;
-    }
-
-    private String comment;
-
-    public String getComment() {
-        return this.comment;
     }
 
     private Instant startTime = Instant.now();
@@ -113,7 +118,15 @@ public class SpeakeasyHarBuilder {
         return this;
     }
 
+    public SpeakeasyHarBuilder withMasking(Masking masking) {
+        this.masking = masking;
+        return this;
+    }
+
+    private SpeakeasyRequest request = null;
+
     public SpeakeasyHarBuilder withRequest(SpeakeasyRequest request) throws IOException {
+        this.request = request;
         // Parse cookies
         List<HarCookie> harCookieList = new ArrayList<>();
 
@@ -123,8 +136,17 @@ public class SpeakeasyHarBuilder {
             harCookieList = cookies.stream().map(c -> {
                 HarCookieBuilder cookieBuilder = new HarCookieBuilder();
                 try {
-                    cookieBuilder.withName(c.getName())
-                            .withValue(c.getValue());
+                    String name = c.getName();
+                    String value = c.getValue();
+
+                    if (this.masking != null) {
+                        String mask = this.masking.getRequestCookieMasks().get(name);
+                        if (mask != null) {
+                            value = mask;
+                        }
+                    }
+
+                    cookieBuilder.withName(name).withValue(value);
                 } catch (Exception e) {
                     this.logger.debug("speakeasy-sdk, error building cookies:", e);
                 }
@@ -143,8 +165,16 @@ public class SpeakeasyHarBuilder {
                     .map(entry -> {
                         List<HarHeader> headersList = new ArrayList<>();
                         for (String value : entry.getValue()) {
+                            String name = entry.getKey();
+                            if (this.masking != null) {
+                                String mask = this.masking.getRequestHeaderMasks().get(name);
+                                if (mask != null) {
+                                    value = mask;
+                                }
+                            }
+
                             headersList.add(new HarHeaderBuilder()
-                                    .withName(entry.getKey())
+                                    .withName(name)
                                     .withValue(value)
                                     .build());
                         }
@@ -155,13 +185,18 @@ public class SpeakeasyHarBuilder {
             harHeaderList.sort((h1, h2) -> h1.getName().compareToIgnoreCase(h2.getName()));
         }
 
+        String body = request.getBodyText(droppedBodyText);
+        if (this.masking != null) {
+            body = this.masking.maskRequestBody(body, request.getContentType());
+        }
+
         HarPostDataBuilder postDataBuilder = new HarPostDataBuilder()
                 .withMimeType(request.getContentType())
-                .withText(request.getBodyText(droppedBodyText));
+                .withText(body);
 
         HarPostData postData = postDataBuilder.build();
 
-        String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
+        String url = resolveURL(request);
 
         HarRequestBuilder builder = new HarRequestBuilder()
                 .withBodySize(request.getContentLength())
@@ -170,8 +205,8 @@ public class SpeakeasyHarBuilder {
                 .withHeadersSize(request.getHeaderSize())
                 .withHttpVersion(request.getProtocol())
                 .withMethod(request.getMethod())
-                .withQueryString(queryString)
-                .withUrl(request.getRequestURI());
+                .withQueryString(getMaskedQueryString(request.getQueryString()))
+                .withUrl(url);
 
         if (request.getContentLength() > 0) {
             builder.withPostData(postData);
@@ -197,8 +232,16 @@ public class SpeakeasyHarBuilder {
                     .map(entry -> {
                         List<HarHeader> headersList = new ArrayList<>();
                         for (String value : entry.getValue()) {
+                            String name = entry.getKey();
+                            if (this.masking != null) {
+                                String mask = this.masking.getResponseHeaderMasks().get(name);
+                                if (mask != null) {
+                                    value = mask;
+                                }
+                            }
+
                             headersList.add(new HarHeaderBuilder()
-                                    .withName(entry.getKey())
+                                    .withName(name)
                                     .withValue(value)
                                     .build());
                         }
@@ -217,9 +260,19 @@ public class SpeakeasyHarBuilder {
             harCookieList = cookies.stream().map(c -> {
                 HarCookieBuilder cookieBuilder = new HarCookieBuilder();
                 try {
+                    String name = c.getName();
+                    String value = c.getValue();
+
+                    if (this.masking != null) {
+                        String mask = this.masking.getResponseCookieMasks().get(name);
+                        if (mask != null) {
+                            value = mask;
+                        }
+                    }
+
                     cookieBuilder
-                            .withName(c.getName())
-                            .withValue(c.getValue())
+                            .withName(name)
+                            .withValue(value)
                             .withExpires(c.getExpires())
                             .withHttpOnly(c.getHttpOnly())
                             .withPath(c.getPath())
@@ -246,7 +299,12 @@ public class SpeakeasyHarBuilder {
             bodySize = 0;
             harContentBuilder.withSize(-1l);
         } else {
-            harContentBuilder.withText(response.getBodyText(droppedBodyText));
+            String body = response.getBodyText(droppedBodyText);
+            if (this.masking != null) {
+                body = this.masking.maskResponseBody(body, contentType);
+            }
+
+            harContentBuilder.withText(body);
         }
 
         String redirectURL = response.getLocationHeader();
@@ -279,15 +337,10 @@ public class SpeakeasyHarBuilder {
         return this;
     }
 
-    public SpeakeasyHarBuilder withComment(String comment) {
-        this.comment = comment;
-        return this;
-    }
-
     public void build() throws IOException {
         DefaultHarStreamWriter harWriter = harWriterBuilder
                 .withOutputStream(outputStream)
-                .withComment(comment)
+                .withComment(String.format("request capture for %s", resolveURL(this.request)))
                 .withCreator(new HarCreator(this.sdkName, "", this.speakeasyVersion))
                 .build();
 
@@ -306,5 +359,130 @@ public class SpeakeasyHarBuilder {
 
         harWriter.addEntry(builder.build());
         harWriter.closeHar();
+    }
+
+    private String resolveURL(SpeakeasyRequest request) {
+        String uri = request.getRequestURI();
+
+        try {
+            URL url = new URL(uri);
+
+            String scheme = url.getProtocol();
+
+            String proxyScheme = getScheme(request);
+            if (StringUtils.hasText(proxyScheme)) {
+                scheme = proxyScheme;
+            }
+
+            String host = url.getHost();
+
+            if (request.getHeaders().containsKey("x-forwarded-host")) {
+                List<String> headers = request.getHeaders().get("x-forwarded-host");
+                if (headers != null && headers.size() > 0) {
+                    host = headers.get(0);
+                }
+            } else if (request.getHeaders().containsKey("host")) {
+                List<String> headers = request.getHeaders().get("host");
+                if (headers != null && headers.size() > 0) {
+                    host = headers.get(0);
+                }
+            }
+
+            StringBuilder builder = new StringBuilder();
+
+            builder
+                    .append(scheme)
+                    .append("://")
+                    .append(host);
+
+            if (!host.contains(":") && url.getPort() != -1 && url.getPort() != 80 && url.getPort() != 443) {
+                builder.append(":").append(url.getPort());
+            }
+
+            builder.append(url.getPath());
+
+            if (StringUtils.hasText(url.getQuery())) {
+                builder.append("?").append(getMaskedQueryString(url.getQuery()));
+            }
+
+            if (StringUtils.hasText(url.getRef())) {
+                builder.append("#").append(url.getRef());
+            }
+
+            return builder.toString();
+
+        } catch (MalformedURLException e) {
+            return uri;
+        }
+    }
+
+    private String getScheme(SpeakeasyRequest request) {
+        String scheme = "";
+
+        if (request.getHeaders().containsKey("x-forwarded-proto")) {
+            List<String> headers = request.getHeaders().get("x-forwarded-proto");
+
+            if (headers != null && headers.size() > 0) {
+                scheme = headers.get(0).toLowerCase();
+            }
+        } else if (request.getHeaders().containsKey("x-forwarded-scheme")) {
+            List<String> headers = request.getHeaders().get("x-forwarded-scheme");
+
+            if (headers != null && headers.size() > 0) {
+                scheme = headers.get(0);
+            }
+        } else if (request.getHeaders().containsKey("forwarded")) {
+            List<String> headers = request.getHeaders().get("forwarded");
+
+            String forwarded = "";
+
+            if (headers != null && headers.size() > 0) {
+                forwarded = headers.get(0).toLowerCase();
+            }
+
+            if (forwarded != "") {
+                Pattern pattern = Pattern.compile("(?i)(?:proto=)(https|http)", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(forwarded);
+                if (matcher.find()) {
+                    scheme = matcher.group(1).toLowerCase();
+                }
+            }
+        }
+
+        return scheme;
+    }
+
+    private String getMaskedQueryString(String queryString) {
+        if (queryString == null) {
+            return "";
+        }
+
+        String[] params = queryString.split("&");
+        List<String> maskedParams = new ArrayList<>();
+
+        for (String param : params) {
+            try {
+                String[] keyValuePair = param.split("=");
+                if (keyValuePair.length == 2) {
+                    String key = URLDecoder.decode(keyValuePair[0], "UTF-8");
+                    String value = URLDecoder.decode(keyValuePair[1], "UTF-8");
+
+                    if (this.masking != null) {
+                        String maskedValue = this.masking.getQueryStringMasks().get(key);
+                        if (maskedValue != null) {
+                            value = maskedValue;
+                        }
+                    }
+
+                    maskedParams.add(URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(value, "UTF-8"));
+                } else {
+                    maskedParams.add(param);
+                }
+            } catch (UnsupportedEncodingException e) {
+                maskedParams.add(param);
+            }
+        }
+
+        return String.join("&", maskedParams);
     }
 }

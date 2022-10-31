@@ -17,6 +17,10 @@
           "cookies": [],
           "headers": [
             {
+              "name": "host",
+              "value": "test.com"
+            },
+            {
               "name": "vary",
               "value": "Origin"
             },
@@ -30,7 +34,7 @@
             }
           ],
           "queryString": [],
-          "headersSize": 89,
+          "headersSize": 105,
           "bodySize": -1
         },
         "response": {
