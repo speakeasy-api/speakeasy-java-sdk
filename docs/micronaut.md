@@ -184,7 +184,7 @@ Below are some examples on how to generate access tokens:
 
 ```java
 @Get("/embed_access_token")
-ublic String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController controller){
+public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController controller){
         String customerId=null;
 
         // populate your customerId
