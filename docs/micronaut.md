@@ -52,7 +52,7 @@ public class Application {
 Create a class called SpeakeasyNettyServerCustomizer.java in your project and add the following code:
 
 ```java
-package dev.speakeasyapi.micronaut;
+package {YOUR_PACKAGE_HERE}; // Replace this with the relevant package name
 
 import dev.speakeasyapi.micronaut.implementation.SpeakeasyChannelDuplexHandler;
 import io.micronaut.context.event.BeanCreatedEvent;
