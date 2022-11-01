@@ -207,7 +207,7 @@ public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddleware
 
 The Speakeasy SDK can generate access tokens for
 our [Developer Portals](https://docs.speakeasyapi.dev/docs/using-speakeasy/build-dev-portals/intro)
-that allows your end users to login to your portal and view their API request logs.
+that allows your end users to login to your portal and self service logs, usage and api keys.
 
 Below are some examples on how to generate access tokens:
 
