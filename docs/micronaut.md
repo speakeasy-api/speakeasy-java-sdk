@@ -200,7 +200,37 @@ public String getSpeakeasyEmbedAccessToken(@RequestAttribute(SpeakeasyMiddleware
         String embedAccessToken=controller.getEmbedAccessToken(filterBuilder.build());
 
         // build response
-        }
+}
+```
+
+## Portal Login Access Tokens
+
+The Speakeasy SDK can generate access tokens for
+our [Developer Portals](https://docs.speakeasyapi.dev/docs/using-speakeasy/build-dev-portals/intro)
+that allows your end users to login to your portal and view their API request logs.
+
+Below are some examples on how to generate access tokens:
+
+```java
+@Get("/portal_login_token")
+public String getPortalLoginAccessToken(@RequestAttribute(SpeakeasyMiddlewareController.Key) SpeakeasyMiddlewareController controller){
+        String customerId="some-customer-id";
+
+        // Restrict data by time (last 24 hours)
+        Instant startTime=Instant.now().minusSeconds(60*60*24);
+        filterBuilder.withTimeFilter(startTime,SpeakeasyAccessTokenFilterOperator.GreaterThan);
+
+        // Populate with any custom claims you want added to the access token
+        Map<String, String> jwtCustomClaims = new HashMap<>();
+
+        // Populate with any permissions you want enabled/disabled for the user
+        Map<String, Boolean> permissions = new HashMap<>();
+
+        String accessToken=controller.getPortalLoginToken(customerId, "some display name", jwtCustomClaims,
+            permissions, filterBuilder.build());
+
+        // build response
+}
 ```
 
 ## Setting up for Tests
