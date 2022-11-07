@@ -17,7 +17,7 @@ dependencies {
 }
 ```
 
-Please check on [maven central](https://mavenlibs.com/maven/pom/dev.speakeasyapi/speakeasyapi-java-sdk) for
+Please check on [maven central](https://mvnrepository.com/artifact/dev.speakeasyapi/speakeasy-java-sdk) for
 the latest release of the SDK.
 
 Add to your Micronaut application:
