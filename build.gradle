@@ -37,7 +37,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.9'
     compileOnly 'io.micronaut:micronaut-http:3.7.2'
     compileOnly 'io.micronaut:micronaut-http-server:3.7.2'
-    compileOnly 'io.micronaut:micronaut-http-netty:3.7.2'
+    compileOnly 'io.micronaut:micronaut-http-netty:3.7.3'
     compileOnly 'io.micronaut:micronaut-http-server-netty:3.7.2'
     implementation 'io.netty:netty-all:4.1.84.Final'
     implementation 'io.projectreactor:reactor-core:3.4.24'
