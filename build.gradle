@@ -30,7 +30,7 @@ dependencies {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
     implementation('org.slf4j:slf4j-api:1.7.36')
-    runtimeOnly 'io.netty:netty-tcnative-boringssl-static:2.0.20.Final'
+    runtimeOnly 'io.netty:netty-tcnative-boringssl-static:2.0.54.Final'
     implementation 'io.grpc:grpc-netty-shaded:1.45.1'
     implementation 'io.grpc:grpc-protobuf:1.45.1'
     implementation 'io.grpc:grpc-stub:1.45.1'
