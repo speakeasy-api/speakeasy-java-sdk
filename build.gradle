@@ -1,4 +1,7 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
     id 'maven-publish'
     id 'signing'
@@ -23,6 +26,9 @@ java {
 }
 
 dependencies {
+    shadow localGroovy()
+    shadow gradleApi()
+
     // Note (alexa): this is the speakeasy fork of the har-java library
     implementation files('lib/har-java.jar')
     implementation files('lib/speakeasy-schemas.jar')
@@ -84,6 +90,19 @@ bootJar {
 task sourceJar(type: Jar) {
     archiveClassifier = "sources"
 }
+
+shadowJar {
+   archiveBaseName.set('speakeasy-java-sdk-1.3.0')
+   archiveClassifier.set('')
+   archiveVersion.set('')
+}
+
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
+tasks.build.dependsOn tasks.shadowJar
 
 publishing {
     publications {
