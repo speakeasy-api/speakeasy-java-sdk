@@ -1,13 +1,11 @@
 package dev.speakeasyapi.micronaut.implementation;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import dev.speakeasyapi.sdk.SpeakeasyCookie;
 import dev.speakeasyapi.sdk.SpeakeasyRequest;
@@ -58,8 +56,10 @@ public class SpeakeasyNettyRequest implements SpeakeasyRequest {
 
     public Map<String, List<String>> getHeaders() {
         if (this.request.headers() != null) {
-            return request.headers().entries().stream().collect(Collectors.groupingBy(Map.Entry::getKey,
-                    Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+            return request.headers().entries().stream()
+                    .collect(Collectors.toMap(e -> e.getKey().toLowerCase(),
+                            e -> Collections.singletonList(e.getValue()),
+                            Utils.merge));
         }
 
         return null;
@@ -122,11 +122,6 @@ public class SpeakeasyNettyRequest implements SpeakeasyRequest {
     }
 
     public String getRequestURI() {
-        UriComponents uriComponents = UriComponentsBuilder
-                .fromUriString(this.request.uri())
-                .query("")
-                .build();
-
-        return uriComponents.toUriString();
+        return this.request.uri();
     }
 }

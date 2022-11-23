@@ -1,7 +1,6 @@
 package dev.speakeasyapi.micronaut.implementation;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URL;
 import java.time.Instant;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -56,14 +55,10 @@ public class SpeakeasyCapture implements Runnable {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try {
-                URL url = new URL(this.request.getRequest().uri());
-
                 new SpeakeasyHarBuilder(this.logger)
                         .withStartTime(context.getStartTime())
                         .withEndTime(endTime)
-                        .withHostName(url.getHost())
                         .withOutputStream(outputStream)
-                        .withPort(url.getPort())
                         .withMasking(controller.getMasking())
                         .withRequest(this.request)
                         .withResponse(this.response, this.request.getProtocol())

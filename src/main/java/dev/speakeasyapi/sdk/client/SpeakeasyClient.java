@@ -35,9 +35,15 @@ public class SpeakeasyClient implements ISpeakeasyClient {
             return;
         }
 
-        try {
-            ManagedChannel channel = createChannel();
+        ManagedChannel channel = null;
 
+        try {
+            channel = createChannel();
+        } catch (SSLException e) {
+            throw new RuntimeException("Failed to create channel", e);
+        }
+
+        try {
             IngestServiceGrpc.IngestServiceBlockingStub blockingStub = IngestServiceGrpc.newBlockingStub(channel);
 
             MaskingMetadata maskingMetadata = MaskingMetadata.newBuilder()
@@ -64,7 +70,11 @@ public class SpeakeasyClient implements ISpeakeasyClient {
 
             Ingest.IngestRequest ingestRequest = ingestRequestBuilder.build();
             blockingStub.ingest(ingestRequest);
+
+            channel.shutdown();
+            channel.awaitTermination(100, java.util.concurrent.TimeUnit.MILLISECONDS);
         } catch (Exception e) {
+            channel.shutdown();
             throw new RuntimeException(e);
         }
     }
@@ -89,7 +99,7 @@ public class SpeakeasyClient implements ISpeakeasyClient {
 
         final String serverUrl = this.cfg.getServerUrl();
 
-        ManagedChannelBuilder channelBuilder;
+        ManagedChannelBuilder<?> channelBuilder;
         if (this.cfg.isSecureGrpc()) {
             channelBuilder = NettyChannelBuilder.forTarget(serverUrl)
                     .sslContext(GrpcSslContexts.forClient()

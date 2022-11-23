@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.EnglishReasonPhraseCatalog;
 import org.slf4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.StringUtils;
 
 import com.smartbear.har.builder.HarContentBuilder;
 import com.smartbear.har.builder.HarCookieBuilder;
@@ -105,16 +105,6 @@ public class SpeakeasyHarBuilder {
 
     public SpeakeasyHarBuilder withEndTime(Instant endTime) {
         this.endTime = endTime;
-        return this;
-    }
-
-    public SpeakeasyHarBuilder withHostName(String hostName) {
-        this.hostName = hostName;
-        return this;
-    }
-
-    public SpeakeasyHarBuilder withPort(int port) {
-        this.port = String.valueOf(port);
         return this;
     }
 
@@ -286,7 +276,8 @@ public class SpeakeasyHarBuilder {
         }
 
         String contentType = response.getContentType();
-        if (!StringUtils.hasText(contentType)) {
+
+        if (StringUtils.isBlank(contentType)) {
             contentType = "application/octet-stream"; // Default HTTP content type
         }
 
@@ -312,7 +303,7 @@ public class SpeakeasyHarBuilder {
         int statusCode = response.getStatus();
         String statusText = null;
         try {
-            statusText = HttpStatus.valueOf(statusCode).getReasonPhrase();
+            statusText = EnglishReasonPhraseCatalog.INSTANCE.getReason(statusCode, null);
         } catch (Exception e) {
             logger.debug("speakeasy-sdk, error retrieving status: ", e);
         }
@@ -347,14 +338,14 @@ public class SpeakeasyHarBuilder {
         HarEntryBuilder builder = new HarEntryBuilder()
                 .withRequest(harRequest)
                 .withResponse(harResponse)
-                .withServerIPAddress(hostName)
+                .withServerIPAddress(this.hostName)
                 .withStartedDateTime(startTime)
                 .withTime(endTime.toEpochMilli() - startTime.toEpochMilli())
                 .withCache(new HarCache())
                 .withTimings(new HarTimings(0l, 0l, 0l, -1l, -1l, -1l, 0l, ""));
 
-        if (!port.equals("-1")) {
-            builder.withConnection(port);
+        if (this.port != null && !this.port.equals("-1")) {
+            builder.withConnection(this.port);
         }
 
         harWriter.addEntry(builder.build());
@@ -364,56 +355,82 @@ public class SpeakeasyHarBuilder {
     private String resolveURL(SpeakeasyRequest request) {
         String uri = request.getRequestURI();
 
+        String scheme = "";
+        String host = "";
+        int port = -1;
+        String path = uri;
+        String queryString = "";
+        String ref = "";
+
         try {
             URL url = new URL(uri);
-
-            String scheme = url.getProtocol();
-
-            String proxyScheme = getScheme(request);
-            if (StringUtils.hasText(proxyScheme)) {
-                scheme = proxyScheme;
-            }
-
-            String host = url.getHost();
-
-            if (request.getHeaders().containsKey("x-forwarded-host")) {
-                List<String> headers = request.getHeaders().get("x-forwarded-host");
-                if (headers != null && headers.size() > 0) {
-                    host = headers.get(0);
-                }
-            } else if (request.getHeaders().containsKey("host")) {
-                List<String> headers = request.getHeaders().get("host");
-                if (headers != null && headers.size() > 0) {
-                    host = headers.get(0);
-                }
-            }
-
-            StringBuilder builder = new StringBuilder();
-
-            builder
-                    .append(scheme)
-                    .append("://")
-                    .append(host);
-
-            if (!host.contains(":") && url.getPort() != -1 && url.getPort() != 80 && url.getPort() != 443) {
-                builder.append(":").append(url.getPort());
-            }
-
-            builder.append(url.getPath());
-
-            if (StringUtils.hasText(url.getQuery())) {
-                builder.append("?").append(getMaskedQueryString(url.getQuery()));
-            }
-
-            if (StringUtils.hasText(url.getRef())) {
-                builder.append("#").append(url.getRef());
-            }
-
-            return builder.toString();
-
+            scheme = url.getProtocol();
+            host = url.getHost();
+            port = url.getPort();
+            path = url.getPath();
+            queryString = url.getQuery();
+            ref = url.getRef();
         } catch (MalformedURLException e) {
-            return uri;
         }
+
+        String proxyScheme = getScheme(request);
+        if (StringUtils.isNotBlank(proxyScheme)) {
+            scheme = proxyScheme;
+        }
+
+        if (request.getHeaders().containsKey("x-forwarded-host")) {
+            List<String> headers = request.getHeaders().get("x-forwarded-host");
+            if (headers != null && headers.size() > 0) {
+                host = headers.get(0);
+            }
+        } else if (request.getHeaders().containsKey("host")) {
+            List<String> headers = request.getHeaders().get("host");
+            if (headers != null && headers.size() > 0) {
+                host = headers.get(0);
+            }
+        }
+
+        this.hostName = host;
+
+        StringBuilder builder = new StringBuilder();
+
+        if (StringUtils.isNotBlank(scheme)) {
+            builder.append(scheme);
+            builder.append("://");
+        }
+
+        if (StringUtils.isNotBlank(host)) {
+            builder.append(host);
+
+            if (port == -1) {
+                String[] parts = host.split(":");
+                if (parts.length > 1) {
+                    try {
+                        port = Integer.parseInt(parts[1]);
+                    } catch (Exception e) {
+                        port = -1;
+                    }
+                }
+            }
+
+            if (!host.contains(":") && port != -1 && port != 80 && port != 443) {
+                builder.append(":").append(port);
+            }
+        }
+
+        this.port = String.valueOf(port);
+
+        builder.append(path);
+
+        if (StringUtils.isNotBlank(queryString)) {
+            builder.append("?").append(getMaskedQueryString(queryString));
+        }
+
+        if (StringUtils.isNotBlank(ref)) {
+            builder.append("#").append(ref);
+        }
+
+        return builder.toString();
     }
 
     private String getScheme(SpeakeasyRequest request) {
