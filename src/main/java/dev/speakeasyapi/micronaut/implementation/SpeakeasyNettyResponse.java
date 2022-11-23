@@ -1,6 +1,7 @@
 package dev.speakeasyapi.micronaut.implementation;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,8 +33,9 @@ public class SpeakeasyNettyResponse implements SpeakeasyResponse {
 
     public Map<String, List<String>> getHeaders() {
         if (this.response.headers() != null) {
-            return response.headers().entries().stream().collect(Collectors.groupingBy(Map.Entry::getKey,
-                    Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+            return response.headers().entries().stream()
+                    .collect(Collectors.toMap(e -> e.getKey().toLowerCase(),
+                            e -> Collections.singletonList(e.getValue())));
         }
 
         return null;
