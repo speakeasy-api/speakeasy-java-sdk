@@ -13,7 +13,7 @@ Add the Speakeasy SDK to your project's build.gradle file:
 
 ```groovy
 dependencies {
-    implementation 'dev.speakeasyapi:speakeasyapi-java-sdk:1.3.0'
+    implementation 'dev.speakeasyapi:speakeasyapi-java-sdk:1.3.1'
 }
 ```
 
