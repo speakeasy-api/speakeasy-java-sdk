@@ -36,7 +36,7 @@ dependencies {
     implementation 'io.grpc:grpc-stub:1.45.1'
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.apache.httpcomponents:httpcore:4.4.15'
-    compileOnly 'io.micronaut:micronaut-http:3.7.2'
+    compileOnly 'io.micronaut:micronaut-http:3.8.2'
     compileOnly 'io.micronaut:micronaut-http-server:3.7.2'
     compileOnly 'io.micronaut:micronaut-http-netty:3.7.2'
     compileOnly 'io.micronaut:micronaut-http-server-netty:3.7.2'
