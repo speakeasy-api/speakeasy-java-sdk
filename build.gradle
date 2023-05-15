@@ -41,7 +41,7 @@ dependencies {
     compileOnly 'io.micronaut:micronaut-http-netty:3.7.2'
     compileOnly 'io.micronaut:micronaut-http-server-netty:3.7.2'
     implementation 'io.netty:netty-all:4.1.84.Final'
-    implementation 'io.projectreactor:reactor-core:3.4.24'
+    implementation 'io.projectreactor:reactor-core:3.5.6'
     implementation files('./src/main/resources/commons-io-2.11.0.jar')
     implementation 'org.yaml:snakeyaml:1.33'
 
